@@ -73,6 +73,8 @@ let server = http.createServer((req, res) => {
                     res.end("You can't send friend request to yourself");
                 } else if(userData[userId]["friends"].indexOf(friendId)>-1) {
                     res.end(friendId+" Found and is already your friend");
+                } else if(userData[friendId]["friendRequests"].indexOf(userId)>-1) {
+                    res.end("You have alread sent friend request to "+friendId);
                 } else {
                     res.end(friendId+" Found. Send Friend Request");
                 }
@@ -92,6 +94,8 @@ let server = http.createServer((req, res) => {
             } else {
                 if(userData[userId]["friends"].indexOf(friendId)>-1) {
                     res.end(friendId+" Found and is already your friend");
+                } else if(userData[friendId]["friendRequests"].indexOf(userId)>-1) {
+                    res.end("You have alread sent friend request to "+friendId);
                 } else {
                     userData[friendId]["friendRequests"].push(userId);
                     userData[friendId]["notifications"].push("You have one friend request from "+userId);

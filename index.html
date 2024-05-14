@@ -61,10 +61,12 @@
             <td>
                 <table id="myPosts">
                     <tr>
-                        <td><input type="text" placeholder="search friend" id="friendId"><input type="button" onclick="searchFriend()" value="Search Friend"></td>
+                        <td><input type="text" placeholder="search friend" id="friendId"><input type="button"
+                                onclick="searchFriend()" value="Search Friend"></td>
                     </tr>
                     <tr>
-                        <td id="friendReqBtnTd"><input type="button" value="" id="friendReqBtn" onclick="sendFriendRequest()"></td>
+                        <td id="friendReqBtnTd"><input type="button" value="" id="friendReqBtn"
+                                onclick="sendFriendRequest()"></td>
                     </tr>
                     <tr>
                         <td><textarea cols="60" rows="3"></textarea></td>
@@ -90,25 +92,47 @@
         function $(selector) {
             return document.querySelector(selector);
         }
+        function _(tag) {
+            return document.createElement(tag);
+        }
         $("#signOut").addEventListener("click", () => {
             window.location.href = "/";
         });
         let user = JSON.parse(`__PLACEHOLDER__`);
+        populateNotification(user.notifications);
         console.log(user);
         $("#userInfo").innerText = "Logged In as @" + user.id;
         //keep checking for notifications
         setInterval(() => {
-            callGetApi("/getNotifications?userId="+user.id,(resp)=>{
-                console.log("notifs",resp);
+            callGetApi("/getNotifications?userId=" + user.id, (resp) => {
+                console.log("notifs", resp);
+                populateNotification(JSON.parse(resp));
             });
-        }, 2000);
+        }, 10000);
+        function deleteAllRowsOfTable(table) {
+            while (table.rows.length > 1) {
+                table.deleteRow(1);
+            }
+        }
+        function populateNotification(notifs) {
+            let notificationsTable = $("#notificationsTable");
+            deleteAllRowsOfTable(notificationsTable);
+            for (let notifIndx = notifs.length - 1; notifIndx >= 0; notifIndx--) {
+                let notif = notifs[notifIndx];
+                let tr = _("tr");
+                let td = _("td");
+                tr.appendChild(td);
+                td.innerText = notif;
+                notificationsTable.appendChild(tr);
+            }
+        }
         setInterval(() => {
-            callGetApi("/getFriendRequests?userId="+user.id,(resp)=>{
-                console.log("friend reqs",resp);
+            callGetApi("/getFriendRequests?userId=" + user.id, (resp) => {
+                console.log("friend reqs", resp);
             });
-        }, 5000);
+        }, 10000);
 
-        function callGetApi(url,callback) {
+        function callGetApi(url, callback) {
             var xhttp = new XMLHttpRequest();
             xhttp.onreadystatechange = function () {
                 if (this.readyState == 4 && this.status == 200) {
@@ -121,20 +145,20 @@
         $("#friendReqBtn").style.display = "none";
         function searchFriend() {
             let friendId = $("#friendId").value;
-            callGetApi("/searchFriend?friendId="+friendId+"___"+user.id,(resp)=>{
+            callGetApi("/searchFriend?friendId=" + friendId + "___" + user.id, (resp) => {
                 $("#friendReqBtn").value = resp;
                 $("#friendReqBtn").style.display = "inline-block";
-                if(resp.indexOf("Send Friend Request")>-1) {
+                if (resp.indexOf("Send Friend Request") > -1) {
                     $("#friendReqBtn").removeAttribute("disabled");
                 } else {
-                    $("#friendReqBtn").setAttribute("disabled","true");
+                    $("#friendReqBtn").setAttribute("disabled", "true");
                 }
-                console.log("search result",resp);
+                console.log("search result", resp);
             });
         }
         function sendFriendRequest() {
             let friendId = $("#friendId").value;
-            callGetApi("/sendFriendReq?friendId="+friendId+"___"+user.id,(resp)=>{
+            callGetApi("/sendFriendReq?friendId=" + friendId + "___" + user.id, (resp) => {
                 $("#friendReqBtn").value = resp;
             });
         }
