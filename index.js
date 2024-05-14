@@ -69,10 +69,33 @@ let server = http.createServer((req, res) => {
             if(userData[friendId]==undefined) {
                 res.end(friendId+" Not found");
             } else {
-                if(userData[userId]["friends"].indexOf(friendId)>-1) {
+                if(friendId==userId) {
+                    res.end("You can't send friend request to yourself");
+                } else if(userData[userId]["friends"].indexOf(friendId)>-1) {
                     res.end(friendId+" Found and is already your friend");
                 } else {
                     res.end(friendId+" Found. Send Friend Request");
+                }
+            }
+        }
+    } else if (req.url.indexOf("/sendFriendReq?friendId=") == 0) {
+        let queryString = req.url.replace("/sendFriendReq?friendId=", "").split("___");
+        if(queryString.length!=2) {
+            res.end("Not found");
+        } else {
+            let friendId = queryString[0];
+            let userId = queryString[1];
+            if(friendId==userId) {
+                res.end("You can't send friend request to yourself");
+            } else if(userData[friendId]==undefined) {
+                res.end(friendId+" Not found");
+            } else {
+                if(userData[userId]["friends"].indexOf(friendId)>-1) {
+                    res.end(friendId+" Found and is already your friend");
+                } else {
+                    userData[friendId]["friendRequests"].push(userId);
+                    userData[friendId]["notifications"].push("You have one friend request from "+userId);
+                    res.end("Frend Request sent to "+friendId);
                 }
             }
         }

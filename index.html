@@ -64,7 +64,7 @@
                         <td><input type="text" placeholder="search friend" id="friendId"><input type="button" onclick="searchFriend()" value="Search Friend"></td>
                     </tr>
                     <tr>
-                        <td id="friendReqBtnTd"><input type="button" value="" id="friendReqBtn"></td>
+                        <td id="friendReqBtnTd"><input type="button" value="" id="friendReqBtn" onclick="sendFriendRequest()"></td>
                     </tr>
                     <tr>
                         <td><textarea cols="60" rows="3"></textarea></td>
@@ -130,6 +130,12 @@
                     $("#friendReqBtn").setAttribute("disabled","true");
                 }
                 console.log("search result",resp);
+            });
+        }
+        function sendFriendRequest() {
+            let friendId = $("#friendId").value;
+            callGetApi("/sendFriendReq?friendId="+friendId+"___"+user.id,(resp)=>{
+                $("#friendReqBtn").value = resp;
             });
         }
     </script>
