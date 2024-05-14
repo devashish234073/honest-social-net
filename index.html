@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Honest Social Net</title>
+    <style>
+        table {
+            margin-top: 3%;
+            margin-left: auto;
+            margin-right: auto;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        td {
+            height: 30px;
+            text-align: center;
+        }
+
+        td input {
+            height: 30px;
+        }
+
+        #signOut {
+            color: red;
+        }
+
+        #signOut:hover {
+            color: orange;
+        }
+    </style>
+</head>
+
+<body>
+    <table>
+        <tr>
+            <td colspan="3">
+                <h1 id="signOut">Sign Out</h1>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                <h2>Welcome to Honest Social Net</h2>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                <h3 id="userInfo"></h3>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <table id="friendRequestsTable">
+                    <tr>
+                        <td>Friend Requests</td>
+                    </tr>
+                </table>
+            </td>
+            <td>
+                <table id="myPosts">
+                    <tr>
+                        <td><input type="text" placeholder="search friend" id="friendId"><input type="button" onclick="searchFriend()" value="Search Friend"></td>
+                    </tr>
+                    <tr>
+                        <td id="friendReqBtnTd"><input type="button" value="" id="friendReqBtn"></td>
+                    </tr>
+                    <tr>
+                        <td><textarea cols="60" rows="3"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td><input type="file"></td>
+                    </tr>
+                    <tr>
+                        <td><button>POST</button></td>
+                    </tr>
+                </table>
+            </td>
+            <td>
+                <table id="notificationsTable">
+                    <tr>
+                        <td>Notifications</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+    <script>
+        function $(selector) {
+            return document.querySelector(selector);
+        }
+        $("#signOut").addEventListener("click", () => {
+            window.location.href = "/";
+        });
+        let user = JSON.parse(`__PLACEHOLDER__`);
+        console.log(user);
+        $("#userInfo").innerText = "Logged In as @" + user.id;
+        //keep checking for notifications
+        setInterval(() => {
+            callGetApi("/getNotifications?userId="+user.id,(resp)=>{
+                console.log("notifs",resp);
+            });
+        }, 2000);
+        setInterval(() => {
+            callGetApi("/getFriendRequests?userId="+user.id,(resp)=>{
+                console.log("friend reqs",resp);
+            });
+        }, 5000);
+
+        function callGetApi(url,callback) {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    callback(xhttp.responseText);
+                }
+            };
+            xhttp.open("GET", url, true);
+            xhttp.send();
+        }
+        $("#friendReqBtn").style.display = "none";
+        function searchFriend() {
+            let friendId = $("#friendId").value;
+            callGetApi("/searchFriend?friendId="+friendId+"___"+user.id,(resp)=>{
+                $("#friendReqBtn").value = resp;
+                $("#friendReqBtn").style.display = "inline-block";
+                if(resp.indexOf("Send Friend Request")>-1) {
+                    $("#friendReqBtn").removeAttribute("disabled");
+                } else {
+                    $("#friendReqBtn").setAttribute("disabled","true");
+                }
+                console.log("search result",resp);
+            });
+        }
+    </script>
+</body>
+
+</html>
