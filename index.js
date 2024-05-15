@@ -98,7 +98,7 @@ let server = http.createServer((req, res) => {
                     res.end("You have alread sent friend request to "+friendId);
                 } else {
                     userData[friendId]["friendRequests"].push(userId);
-                    userData[friendId]["notifications"].push("You have one friend request from "+userId);
+                    userData[friendId]["notifications"].push("You have one friend request from @"+userId);
                     res.end("Frend Request sent to "+friendId);
                 }
             }
