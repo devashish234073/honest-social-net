@@ -103,6 +103,29 @@ let server = http.createServer((req, res) => {
                 }
             }
         }
+    } else if (req.url.indexOf("/acceptFriendReq?friendId=") == 0) {
+        let queryString = req.url.replace("/acceptFriendReq?friendId=", "").split("___");
+        if(queryString.length!=2) {
+            res.end("Not found");
+        } else {
+            let friendId = queryString[0];
+            let userId = queryString[1];
+            if(userData[userId]["friends"].indexOf(friendId)>-1) {
+                userData[userId]["friends"].push(friendId);
+            }
+            userData[friendId]["friendRequests"].splice(userData[userId]["friendRequests"].indexOf(friendId), 1);
+            res.end("done");
+        }
+    } else if (req.url.indexOf("/rejectFriendReq?friendId=") == 0) {
+        let queryString = req.url.replace("/rejectFriendReq?friendId=", "").split("___");
+        if(queryString.length!=2) {
+            res.end("Not found");
+        } else {
+            let friendId = queryString[0];
+            let userId = queryString[1];
+            userData[friendId]["friendRequests"].splice(userData[userId]["friendRequests"].indexOf(friendId), 1);
+            res.end("done");
+        }
     } else if (req.url.indexOf("/getPost?postId=") == 0) {
         let postDetails = req.url.replace("/getPost?postDetails=", "");
         postDetails = postDetails.split("___");

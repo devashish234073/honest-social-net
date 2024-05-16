@@ -41,21 +41,39 @@
         #friendRequestsTable td, #notificationsTable td {
             color:yellow;
         }
+        #friendRequestsTable {
+            width: 300px;
+        }
+        .freq0 {
+            width: 220px;
+        }
+        .freq1 {
+            background-color: green !important;
+            color: white !important;
+            border-radius: 10px;
+            width: 60px;
+        }
+        .freq2 {
+            background-color: red !important;
+            color: white !important;
+            border-radius: 10px;
+            width: 60px;
+        }
     </style>
 </head>
 
 <body>
     <table class="topTable">
         <tr>
-            <td>Friend Requests</td>
             <td>Notifications</td>
+            <td>Friend Requests</td>
             <td>
                 <span id="signOut">Sign Out</span>
             </td>
         </tr>
         <tr>
-            <td><table id="friendRequestsTable"></table></td>
             <td><table id="notificationsTable"></table></td>
+            <td><table id="friendRequestsTable"></table></td>
             <td></td>
         </tr>
     </table>
@@ -130,8 +148,31 @@
         setInterval(() => {
             callGetApi("/getFriendRequests?userId=" + user.id, (resp) => {
                 console.log("friend reqs", resp);
+                populateFriendRequests(JSON.parse(resp));
             });
         }, 10000);
+        populateFriendRequests(user.friendRequests);
+        function populateFriendRequests(friendReqs) {
+            let friendRequestsTable = $("#friendRequestsTable");
+            deleteAllRowsOfTable(friendRequestsTable);
+            for (let freqIndx = friendReqs.length - 1; freqIndx >= 0; freqIndx--) {
+                let friendReq = friendReqs[freqIndx];
+                let tr = _("tr");
+                let td0 = _("td");
+                let td1 = _("td");
+                let td2 = _("td");
+                tr.appendChild(td0);
+                tr.appendChild(td1);
+                tr.appendChild(td2);
+                td0.innerText = "@"+friendReq+" sent a friend request";
+                td0.setAttribute("class","freq0");
+                td1.innerText = "Accept";
+                td1.setAttribute("class","freq1");
+                td2.innerText = "Reject";
+                td2.setAttribute("class","freq2");
+                friendRequestsTable.appendChild(tr);
+            }
+        }
 
         function callGetApi(url, callback) {
             var xhttp = new XMLHttpRequest();
