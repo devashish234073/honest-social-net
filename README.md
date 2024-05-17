@@ -10,5 +10,10 @@ This is the signIn vs signUp logic:
 
 User is initialized with several arrays like friends , friendRequests, notifications, etc.
 
+The accept and reject friend request login is(For ACCEPT the friendId is removed from the friendRequest list and the friend list of each other is updated with each other's Id):
+
+![image](https://github.com/devashish234073/honest-social-net/assets/20777854/33427fc8-816f-4116-ba75-2fc4c0896934)
+
+
 Also planning to implement the feature where after liking a picture post the picture content will change , i.e. interactive like feature.
 
