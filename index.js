@@ -27,8 +27,10 @@ let server = http.createServer((req, res) => {
         fs.readFile("index.html", (err, data) => {
             let html = String(data);
             if (userData[userId] == undefined) {//signup
+                console.log("NEW USER signup @"+userId);
                 userData[userId] = { "id": userId, "friendRequests": [], "friends": [], "posts": [], "friendsPosts": [], "notifications": [] };
             } else {
+                console.log("EXISTING USER loggedIn @"+userId+" has "+userData[userId]["friends"].length+" friends.");
                 userData[userId]["friendsPosts"] = [];
                 for (let f = 0; f < userData[userId]["friends"].length; f++) {
                     let friendId = userData[userId]["friends"][f];
@@ -75,6 +77,8 @@ let server = http.createServer((req, res) => {
                     res.end(friendId+" Found and is already your friend");
                 } else if(userData[friendId]["friendRequests"].indexOf(userId)>-1) {
                     res.end("You have alread sent friend request to "+friendId);
+                } else if(userData[userId]["friendRequests"].indexOf(friendId)>-1) {
+                    res.end("You have already have a frnd req from "+friendId);
                 } else {
                     res.end(friendId+" Found. Send Friend Request");
                 }
@@ -110,11 +114,17 @@ let server = http.createServer((req, res) => {
         } else {
             let friendId = queryString[0];
             let userId = queryString[1];
-            if(userData[userId]["friends"].indexOf(friendId)>-1) {
+            if(userData[userId]["friends"].indexOf(friendId)==-1) {
+                let lenB4 = userData[userId]["friends"].length;
+                //add to each other's friend list
                 userData[userId]["friends"].push(friendId);
+                userData[friendId]["friends"].push(userId);
+                userData[friendId]["notifications"].push("@"+userId+" accepted your friend request.");
+                let lenAfter = userData[userId]["friends"].length;
+                console.log("@"+userId+" ACCEPTED friend request of @"+friendId+" total number of friends changed from "+lenB4+" to "+lenAfter);
             }
-            userData[friendId]["friendRequests"].splice(userData[userId]["friendRequests"].indexOf(friendId), 1);
-            res.end("done");
+            userData[userId]["friendRequests"].splice(userData[userId]["friendRequests"].indexOf(friendId), 1);
+            res.end(JSON.stringify(userData[userId]["friendRequests"]));
         }
     } else if (req.url.indexOf("/rejectFriendReq?friendId=") == 0) {
         let queryString = req.url.replace("/rejectFriendReq?friendId=", "").split("___");
@@ -123,8 +133,9 @@ let server = http.createServer((req, res) => {
         } else {
             let friendId = queryString[0];
             let userId = queryString[1];
-            userData[friendId]["friendRequests"].splice(userData[userId]["friendRequests"].indexOf(friendId), 1);
-            res.end("done");
+            console.log("@"+userId+" REJECTED friend request of @"+friendId);
+            userData[userId]["friendRequests"].splice(userData[userId]["friendRequests"].indexOf(friendId), 1);
+            res.end(JSON.stringify(userData[userId]["friendRequests"]));
         }
     } else if (req.url.indexOf("/getPost?postId=") == 0) {
         let postDetails = req.url.replace("/getPost?postDetails=", "");

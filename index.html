@@ -167,8 +167,14 @@
                 td0.innerText = "@"+friendReq+" sent a friend request";
                 td0.setAttribute("class","freq0");
                 td1.innerText = "Accept";
+                td1.addEventListener("click",function(){
+                    acceptFriendRequest(friendReq);
+                });
                 td1.setAttribute("class","freq1");
                 td2.innerText = "Reject";
+                td2.addEventListener("click",function(){
+                    rejectFriendRequest(friendReq);
+                });
                 td2.setAttribute("class","freq2");
                 friendRequestsTable.appendChild(tr);
             }
@@ -199,9 +205,23 @@
             });
         }
         function sendFriendRequest() {
+            if($("#friendReqBtn").value.indexOf("Send Friend Request")==-1) {
+                alert("Invalid state");
+                return;
+            }
             let friendId = $("#friendId").value;
             callGetApi("/sendFriendReq?friendId=" + friendId + "___" + user.id, (resp) => {
                 $("#friendReqBtn").value = resp;
+            });
+        }
+        function acceptFriendRequest(friendId) {
+            callGetApi("/acceptFriendReq?friendId=" + friendId + "___" + user.id, (resp) => {
+                populateFriendRequests(JSON.parse(resp));
+            });
+        }
+        function rejectFriendRequest(friendId) {
+            callGetApi("/rejectFriendReq?friendId=" + friendId + "___" + user.id, (resp) => {
+                populateFriendRequests(JSON.parse(resp));
             });
         }
     </script>
