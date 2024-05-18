@@ -37,6 +37,14 @@ setInterval(function(){
 populateData();
 
 let server = http.createServer((req, res) => {
+    const cookieHeader = req.headers.cookie;
+    if(!cookieHeader) {
+        console.log("new cookie set");
+        const expires = new Date();
+        expires.setFullYear(expires.getFullYear() + 100);
+        const cookie = `tok=${generateUUID()}; Expires=${expires.toUTCString()}; HttpOnly`;
+        res.setHeader('Set-Cookie', cookie);
+    }
     if (req.url == "/" || req.url == "/login") {
         fs.readFile("login.html", (err, data) => {
             let html = String(data);
