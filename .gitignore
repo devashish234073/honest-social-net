@@ -2,3 +2,5 @@
 uploads/*
 # But do not ignore placeholder.txt
 !uploads/placeholder.txt
+data/*
+!data/placeholder.txt

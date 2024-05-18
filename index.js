@@ -4,17 +4,37 @@ const PORT = 9090;
 let userData = {};
 let posts = {};
 
-function pushDefaultUsers() {
+function populateData() {
+    try {
+        userData = JSON.parse(fs.readFileSync("data/users.json"));
+        posts = JSON.parse(fs.readFileSync("data/posts.json"));
+    } catch(e) {
+        console.error("Unable to populate data from local",e);
+    }
     if (Object.keys(userData).length === 0) {
+        console.log("no data found locally. Populating default users");
         userData["user123"] = { "id": "user123", "friendRequests": [], "friends": ["user124", "user125", "user126", "user127"], "posts": [], "friendsPosts": [], "notifications": [] };
         userData["user124"] = { "id": "user124", "friendRequests": [], "friends": ["user123", "user125"], "posts": [], "friendsPosts": [], "notifications": [] };
         userData["user125"] = { "id": "user125", "friendRequests": [], "friends": ["user123", "user124"], "posts": [], "friendsPosts": [], "notifications": [] };
         userData["user126"] = { "id": "user126", "friendRequests": [], "friends": ["user123", "user127"], "posts": [], "friendsPosts": [], "notifications": [] };
         userData["user127"] = { "id": "user127", "friendRequests": [], "friends": ["user123", "user126"], "posts": [], "friendsPosts": [], "notifications": [] };
+    } else {
+        console.log("data restored from local");
     }
 }
 
-pushDefaultUsers();
+function syncDataLocally() {
+    fs.writeFileSync("data/users.json",JSON.stringify(userData));
+    console.log("users synched locally at "+(new Date()));
+    fs.writeFileSync("data/posts.json",JSON.stringify(posts));
+    console.log("posts synched locally at "+(new Date()));
+}
+
+setInterval(function(){
+    syncDataLocally();
+},60000);
+
+populateData();
 
 let server = http.createServer((req, res) => {
     if (req.url == "/" || req.url == "/login") {
@@ -22,6 +42,9 @@ let server = http.createServer((req, res) => {
             let html = String(data);
             res.end(html);
         });
+    } else if (req.url == "/syncData") {
+        syncDataLocally();
+        res.end("data synched");
     } else if (req.url.indexOf("/login?id=") == 0) {
         let userId = req.url.replace("/login?id=", "");
         fs.readFile("index.html", (err, data) => {
@@ -200,8 +223,10 @@ let server = http.createServer((req, res) => {
                     }
                 }
             });
-            let post = {"id":generateUUID2(),"image":fileName,"caption":caption};
-            userData[userId]["posts"].push(post);
+            let postId = generateUUID2();
+            let post = {"id":postId,"image":fileName,"caption":caption};
+            userData[userId]["posts"].push(postId);
+            posts[postId] = post;
             console.log("status update",post);
             res.writeHead(200, { 'Content-Type': 'text/plain' });
             res.end('success');
