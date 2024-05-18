@@ -1,0 +1,4 @@
+# Ignore all files in the uploads directory
+uploads/*
+# But do not ignore placeholder.txt
+!uploads/placeholder.txt

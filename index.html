@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Honest Social Net</title>
     <style>
-
         table {
             margin-left: auto;
             margin-right: auto;
@@ -26,7 +25,7 @@
         #signOut {
             color: red;
             font-weight: bold;
-            font-size:20px;
+            font-size: 20px;
         }
 
         #signOut:hover {
@@ -35,24 +34,30 @@
 
         .topTable {
             background-color: black;
-            color:white;
-            font-size:14px;
+            color: white;
+            font-size: 14px;
         }
-        #friendRequestsTable td, #notificationsTable td {
-            color:yellow;
+
+        #friendRequestsTable td,
+        #notificationsTable td {
+            color: yellow;
         }
+
         #friendRequestsTable {
             width: 300px;
         }
+
         .freq0 {
             width: 220px;
         }
+
         .freq1 {
             background-color: green !important;
             color: white !important;
             border-radius: 10px;
             width: 60px;
         }
+
         .freq2 {
             background-color: red !important;
             color: white !important;
@@ -72,15 +77,20 @@
             </td>
         </tr>
         <tr>
-            <td><table id="notificationsTable"></table></td>
-            <td><table id="friendRequestsTable"></table></td>
+            <td>
+                <table id="notificationsTable"></table>
+            </td>
+            <td>
+                <table id="friendRequestsTable"></table>
+            </td>
             <td></td>
         </tr>
     </table>
     <table>
         <tr>
             <td colspan="3">
-                <h2>Welcome to Honest Social Net</h2><h3 id="userInfo"></h3>
+                <h2>Welcome to Honest Social Net</h2>
+                <h3 id="userInfo"></h3>
             </td>
         </tr>
         <tr>
@@ -95,13 +105,17 @@
                                 onclick="sendFriendRequest()"></td>
                     </tr>
                     <tr>
-                        <td><textarea cols="60" rows="3" placeholder="Say something to the world"></textarea></td>
+                        <td><textarea cols="60" rows="3" placeholder="Say something to the world"
+                                id="caption"></textarea></td>
                     </tr>
                     <tr>
-                        <td><input type="file"></td>
+                        <td>
+                            <input type="file" id="image" name="image" accept="image/*"><input type="button"
+                                value="POST" onclick="postStatus()">
+                        </td>
                     </tr>
                     <tr>
-                        <td><button>POST</button></td>
+                        <td></td>
                     </tr>
                 </table>
             </td>
@@ -145,6 +159,27 @@
                 notificationsTable.appendChild(tr);
             }
         }
+        function postStatus() {
+            let image = $("#image");
+            const imageFile = image.files[0];
+            let caption = $("#caption").value;
+            const formData = new FormData();
+            if (imageFile) {
+                formData.append('image', imageFile);
+            }
+            formData.append('caption', caption);
+            formData.append('userId',user.id);
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/postStatus', true);
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    alert('Status update success');
+                } else {
+                    alert('Status update failed. Error code '+xhr.status);
+                }
+            };
+            xhr.send(formData);
+        }
         setInterval(() => {
             callGetApi("/getFriendRequests?userId=" + user.id, (resp) => {
                 console.log("friend reqs", resp);
@@ -164,18 +199,18 @@
                 tr.appendChild(td0);
                 tr.appendChild(td1);
                 tr.appendChild(td2);
-                td0.innerText = "@"+friendReq+" sent a friend request";
-                td0.setAttribute("class","freq0");
+                td0.innerText = "@" + friendReq + " sent a friend request";
+                td0.setAttribute("class", "freq0");
                 td1.innerText = "Accept";
-                td1.addEventListener("click",function(){
+                td1.addEventListener("click", function () {
                     acceptFriendRequest(friendReq);
                 });
-                td1.setAttribute("class","freq1");
+                td1.setAttribute("class", "freq1");
                 td2.innerText = "Reject";
-                td2.addEventListener("click",function(){
+                td2.addEventListener("click", function () {
                     rejectFriendRequest(friendReq);
                 });
-                td2.setAttribute("class","freq2");
+                td2.setAttribute("class", "freq2");
                 friendRequestsTable.appendChild(tr);
             }
         }
@@ -205,7 +240,7 @@
             });
         }
         function sendFriendRequest() {
-            if($("#friendReqBtn").value.indexOf("Send Friend Request")==-1) {
+            if ($("#friendReqBtn").value.indexOf("Send Friend Request") == -1) {
                 alert("Invalid state");
                 return;
             }

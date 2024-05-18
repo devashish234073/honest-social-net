@@ -5,12 +5,12 @@ let userData = {};
 let posts = {};
 
 function pushDefaultUsers() {
-    if(Object.keys(userData).length === 0) {
-        userData["user123"] = { "id": "user123", "friendRequests": [], "friends": ["user124","user125","user126","user127"], "posts": [], "friendsPosts": [], "notifications": [] };
-        userData["user124"] = { "id": "user124", "friendRequests": [], "friends": ["user123","user125"], "posts": [], "friendsPosts": [], "notifications": [] };
-        userData["user125"] = { "id": "user125", "friendRequests": [], "friends": ["user123","user124"], "posts": [], "friendsPosts": [], "notifications": [] };
-        userData["user126"] = { "id": "user126", "friendRequests": [], "friends": ["user123","user127"], "posts": [], "friendsPosts": [], "notifications": [] };
-        userData["user127"] = { "id": "user127", "friendRequests": [], "friends": ["user123","user126"], "posts": [], "friendsPosts": [], "notifications": [] };
+    if (Object.keys(userData).length === 0) {
+        userData["user123"] = { "id": "user123", "friendRequests": [], "friends": ["user124", "user125", "user126", "user127"], "posts": [], "friendsPosts": [], "notifications": [] };
+        userData["user124"] = { "id": "user124", "friendRequests": [], "friends": ["user123", "user125"], "posts": [], "friendsPosts": [], "notifications": [] };
+        userData["user125"] = { "id": "user125", "friendRequests": [], "friends": ["user123", "user124"], "posts": [], "friendsPosts": [], "notifications": [] };
+        userData["user126"] = { "id": "user126", "friendRequests": [], "friends": ["user123", "user127"], "posts": [], "friendsPosts": [], "notifications": [] };
+        userData["user127"] = { "id": "user127", "friendRequests": [], "friends": ["user123", "user126"], "posts": [], "friendsPosts": [], "notifications": [] };
     }
 }
 
@@ -27,10 +27,10 @@ let server = http.createServer((req, res) => {
         fs.readFile("index.html", (err, data) => {
             let html = String(data);
             if (userData[userId] == undefined) {//signup
-                console.log("NEW USER signup @"+userId);
+                console.log("NEW USER signup @" + userId);
                 userData[userId] = { "id": userId, "friendRequests": [], "friends": [], "posts": [], "friendsPosts": [], "notifications": [] };
             } else {
-                console.log("EXISTING USER loggedIn @"+userId+" has "+userData[userId]["friends"].length+" friends.");
+                console.log("EXISTING USER loggedIn @" + userId + " has " + userData[userId]["friends"].length + " friends.");
                 userData[userId]["friendsPosts"] = [];
                 for (let f = 0; f < userData[userId]["friends"].length; f++) {
                     let friendId = userData[userId]["friends"][f];
@@ -63,77 +63,77 @@ let server = http.createServer((req, res) => {
         }
     } else if (req.url.indexOf("/searchFriend?friendId=") == 0) {
         let queryString = req.url.replace("/searchFriend?friendId=", "").split("___");
-        if(queryString.length!=2) {
+        if (queryString.length != 2) {
             res.end("Not found");
         } else {
             let friendId = queryString[0];
             let userId = queryString[1];
-            if(userData[friendId]==undefined) {
-                res.end(friendId+" Not found");
+            if (userData[friendId] == undefined) {
+                res.end(friendId + " Not found");
             } else {
-                if(friendId==userId) {
+                if (friendId == userId) {
                     res.end("You can't send friend request to yourself");
-                } else if(userData[userId]["friends"].indexOf(friendId)>-1) {
-                    res.end(friendId+" Found and is already your friend");
-                } else if(userData[friendId]["friendRequests"].indexOf(userId)>-1) {
-                    res.end("You have alread sent friend request to "+friendId);
-                } else if(userData[userId]["friendRequests"].indexOf(friendId)>-1) {
-                    res.end("You have already have a frnd req from "+friendId);
+                } else if (userData[userId]["friends"].indexOf(friendId) > -1) {
+                    res.end(friendId + " Found and is already your friend");
+                } else if (userData[friendId]["friendRequests"].indexOf(userId) > -1) {
+                    res.end("You have alread sent friend request to " + friendId);
+                } else if (userData[userId]["friendRequests"].indexOf(friendId) > -1) {
+                    res.end("You have already have a frnd req from " + friendId);
                 } else {
-                    res.end(friendId+" Found. Send Friend Request");
+                    res.end(friendId + " Found. Send Friend Request");
                 }
             }
         }
     } else if (req.url.indexOf("/sendFriendReq?friendId=") == 0) {
         let queryString = req.url.replace("/sendFriendReq?friendId=", "").split("___");
-        if(queryString.length!=2) {
+        if (queryString.length != 2) {
             res.end("Not found");
         } else {
             let friendId = queryString[0];
             let userId = queryString[1];
-            if(friendId==userId) {
+            if (friendId == userId) {
                 res.end("You can't send friend request to yourself");
-            } else if(userData[friendId]==undefined) {
-                res.end(friendId+" Not found");
+            } else if (userData[friendId] == undefined) {
+                res.end(friendId + " Not found");
             } else {
-                if(userData[userId]["friends"].indexOf(friendId)>-1) {
-                    res.end(friendId+" Found and is already your friend");
-                } else if(userData[friendId]["friendRequests"].indexOf(userId)>-1) {
-                    res.end("You have alread sent friend request to "+friendId);
+                if (userData[userId]["friends"].indexOf(friendId) > -1) {
+                    res.end(friendId + " Found and is already your friend");
+                } else if (userData[friendId]["friendRequests"].indexOf(userId) > -1) {
+                    res.end("You have alread sent friend request to " + friendId);
                 } else {
                     userData[friendId]["friendRequests"].push(userId);
-                    userData[friendId]["notifications"].push("You have one friend request from @"+userId);
-                    res.end("Frend Request sent to "+friendId);
+                    userData[friendId]["notifications"].push("You have one friend request from @" + userId);
+                    res.end("Frend Request sent to " + friendId);
                 }
             }
         }
     } else if (req.url.indexOf("/acceptFriendReq?friendId=") == 0) {
         let queryString = req.url.replace("/acceptFriendReq?friendId=", "").split("___");
-        if(queryString.length!=2) {
+        if (queryString.length != 2) {
             res.end("Not found");
         } else {
             let friendId = queryString[0];
             let userId = queryString[1];
-            if(userData[userId]["friends"].indexOf(friendId)==-1) {
+            if (userData[userId]["friends"].indexOf(friendId) == -1) {
                 let lenB4 = userData[userId]["friends"].length;
                 //add to each other's friend list
                 userData[userId]["friends"].push(friendId);
                 userData[friendId]["friends"].push(userId);
-                userData[friendId]["notifications"].push("@"+userId+" accepted your friend request.");
+                userData[friendId]["notifications"].push("@" + userId + " accepted your friend request.");
                 let lenAfter = userData[userId]["friends"].length;
-                console.log("@"+userId+" ACCEPTED friend request of @"+friendId+" total number of friends changed from "+lenB4+" to "+lenAfter);
+                console.log("@" + userId + " ACCEPTED friend request of @" + friendId + " total number of friends changed from " + lenB4 + " to " + lenAfter);
             }
             userData[userId]["friendRequests"].splice(userData[userId]["friendRequests"].indexOf(friendId), 1);
             res.end(JSON.stringify(userData[userId]["friendRequests"]));
         }
     } else if (req.url.indexOf("/rejectFriendReq?friendId=") == 0) {
         let queryString = req.url.replace("/rejectFriendReq?friendId=", "").split("___");
-        if(queryString.length!=2) {
+        if (queryString.length != 2) {
             res.end("Not found");
         } else {
             let friendId = queryString[0];
             let userId = queryString[1];
-            console.log("@"+userId+" REJECTED friend request of @"+friendId);
+            console.log("@" + userId + " REJECTED friend request of @" + friendId);
             userData[userId]["friendRequests"].splice(userData[userId]["friendRequests"].indexOf(friendId), 1);
             res.end(JSON.stringify(userData[userId]["friendRequests"]));
         }
@@ -152,8 +152,81 @@ let server = http.createServer((req, res) => {
         } else {
             return "{}";
         }
+    } else if (req.method === 'POST' && req.url === '/postStatus') {
+        const boundary = req.headers['content-type'].split('; ')[1].replace('boundary=', '');
+        let body = '';
+        req.setEncoding('binary');
+
+        req.on('data', chunk => {
+            body += chunk;
+        });
+
+        req.on('end', () => {
+            const parts = body.split(`--${boundary}`);
+            parts.pop(); // Remove the last part
+            parts.shift(); // Remove the first part
+            let fileName = null;
+            let caption = null;
+            let userId = null;
+            parts.forEach(part => {
+                const [headers, rawBody] = part.split('\r\n\r\n');
+                if (headers && rawBody) {
+                    const dispositionMatch = headers.match(/Content-Disposition: form-data; name="([^"]+)"; filename="([^"]+)"/);
+                    const dispositionMatch2 = headers.match(/Content-Disposition: form-data; name="caption"/);
+                    const dispositionMatch3 = headers.match(/Content-Disposition: form-data; name="userId"/);
+                    if (dispositionMatch) {
+                        fileName = dispositionMatch[2].split(".");
+                        fileName = generateUUID()+"."+fileName[fileName.length-1];
+                        const content = rawBody.slice(0, rawBody.lastIndexOf('\r\n'));
+                        const buffer = Buffer.from(content, 'binary');
+
+                        fs.writeFile(`uploads/${fileName}`, buffer, err => {
+                            if (err) {
+                                res.writeHead(500, { 'Content-Type': 'text/plain' });
+                                res.end('Server Error');
+                                return;
+                            }
+                        });
+                    } else if(dispositionMatch2) {
+                        const name = dispositionMatch2[0];
+                        if(name.indexOf("name=\"caption\"")>-1) {
+                            caption = rawBody.trim();
+                        }
+                    } else if(dispositionMatch3) {
+                        const name = dispositionMatch3[0];
+                        if(name.indexOf("name=\"userId\"")>-1) {
+                            userId = rawBody.trim();
+                        }
+                    }
+                }
+            });
+            let post = {"id":generateUUID2(),"image":fileName,"caption":caption};
+            userData[userId]["posts"].push(post);
+            console.log("status update",post);
+            res.writeHead(200, { 'Content-Type': 'text/plain' });
+            res.end('success');
+        });
+    } else {
+        res.writeHead(400, { 'Content-Type': 'text/plain' });
+        res.end('400 Bad Request');
     }
 });
+
+function generateUUID2() {
+    return 'xxxxxxxx-x3xx-4xxx-yxxx'.replace(/[xy]/g, function (c) {
+        const r = Math.random() * 16 | 0,
+            v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+
+function generateUUID() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        const r = Math.random() * 16 | 0,
+            v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
 
 server.listen(PORT, () => {
     console.log(`listening on PORT ${PORT}`);
