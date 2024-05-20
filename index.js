@@ -3,6 +3,9 @@ let fs = require("fs");
 const PORT = 9090;
 let userData = {};
 let posts = {};
+const EVERYONE = "everyone";
+const PRIVATE = "private";
+const ONLYFRIENDS = "onlyfriends";
 
 function populateData() {
     try {
@@ -168,7 +171,7 @@ let server = http.createServer((req, res) => {
             userData[userId]["friendRequests"].splice(userData[userId]["friendRequests"].indexOf(friendId), 1);
             res.end(JSON.stringify(userData[userId]["friendRequests"]));
         }
-    } else if (req.url.indexOf("/getPost?postId=") == 0) {
+    } else if (req.url.indexOf("/getPost?postDetails=") == 0) {
         let postDetails = req.url.replace("/getPost?postDetails=", "");
         postDetails = postDetails.split("___");
         if (postDetails.length == 3) {
@@ -176,12 +179,33 @@ let server = http.createServer((req, res) => {
             let friendId = postDetails[1];
             let postId = postDetails[2];
             if (!userData[userId]) {
-                return "{}";
+                res.end("{}");
             } else {
-                res.end(JSON.stringify(userData[userId]["notifications"]));
+                let post = posts[postsId];
+                if(!post) {
+                    res.end("{}");
+                } else {
+                    let image = null;
+                    if(post.visibility==EVERYONE) {
+                        image = post.image;
+                    }
+                    if(image!=null) {
+                        fs.readFile("uploads/"+image, (err, data) => {
+                            if (err) {
+                                res.status(500).send('Error reading the image file');
+                            } else {
+                                res.writeHead(200, {'Content-Type': 'image/jpeg','caption':post.caption});
+                                res.end(data);
+                            }
+                        });
+                    } else {
+                        res.writeHead(200, {'Content-Type': 'text/plain'});
+                        res.end(post.caption);
+                    }
+                }
             }
         } else {
-            return "{}";
+            res.end("{}");
         }
     } else if (req.method === 'POST' && req.url === '/postStatus') {
         const boundary = req.headers['content-type'].split('; ')[1].replace('boundary=', '');
@@ -232,7 +256,7 @@ let server = http.createServer((req, res) => {
                 }
             });
             let postId = generateUUID2();
-            let post = {"id":postId,"image":fileName,"caption":caption};
+            let post = {"id":postId,"image":fileName,"caption":caption,"visibility":EVERYONE,"userId":userId};
             userData[userId]["posts"].push(postId);
             posts[postId] = post;
             console.log("status update",post);
