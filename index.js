@@ -71,7 +71,7 @@ let server = http.createServer((req, res) => {
                     let friendData = userData[friendId];
                     for (let p = 0; p < friendData["posts"].length; p++) {
                         let postId = friendData["posts"][p];
-                        userData[userId]["friendsPosts"].push(postId);
+                        userData[userId]["friendsPosts"].push({"friendId":friendId,"postId":postId});
                         if (p > 3) {//at most 3 posts from a friend in timeline
                             break;
                         }
@@ -181,7 +181,7 @@ let server = http.createServer((req, res) => {
             if (!userData[userId]) {
                 res.end("{}");
             } else {
-                let post = posts[postsId];
+                let post = posts[postId];
                 if(!post) {
                     res.end("{}");
                 } else {
