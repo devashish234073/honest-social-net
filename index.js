@@ -158,7 +158,7 @@ let server = http.createServer((req, res) => {
                 console.log("@" + userId + " ACCEPTED friend request of @" + friendId + " total number of friends changed from " + lenB4 + " to " + lenAfter);
             }
             userData[userId]["friendRequests"].splice(userData[userId]["friendRequests"].indexOf(friendId), 1);
-            res.end(JSON.stringify(userData[userId]["friendRequests"]));
+            res.end(JSON.stringify({"friendRequests":userData[userId]["friendRequests"],"friends":userData[userId]["friends"]}));
         }
     } else if (req.url.indexOf("/rejectFriendReq?friendId=") == 0) {
         let queryString = req.url.replace("/rejectFriendReq?friendId=", "").split("___");

@@ -315,7 +315,9 @@
         }
         function acceptFriendRequest(friendId) {
             callGetApi("/acceptFriendReq?friendId=" + friendId + "___" + user.id, (resp) => {
-                populateFriendRequests(JSON.parse(resp));
+                let obj = JSON.parse(resp);
+                populateFriendRequests(obj.friendRequests);
+                populateFriendsTable(obj.friends);
             });
         }
         function rejectFriendRequest(friendId) {
