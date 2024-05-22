@@ -130,7 +130,7 @@
         </tr>
     </table>
     <table id="myPosts">
-        
+
     </table>
     <script>
         function $(selector) {
@@ -147,13 +147,13 @@
         populateFriendsTable(user.friends);
         console.log(user);
         $("#userInfo").innerText = "Logged In as @" + user.id;
-        for(let i=0;i<user.posts.length;i++) {
+        for (let i = 0; i < user.posts.length; i++) {
             let postId = user.posts[i];
-            getStatusUpdate(postId,user.id,user.id);
+            getStatusUpdate(postId, user.id, user.id);
         }
-        for(let i=0;i<user.friendsPosts.length;i++) {
+        for (let i = 0; i < user.friendsPosts.length; i++) {
             let friendsPost = user.friendsPosts[i];
-            getStatusUpdate(friendsPost.postId,friendsPost.friendId,user.id);
+            getStatusUpdate(friendsPost.postId, friendsPost.friendId, user.id);
         }
         //keep checking for notifications
         setInterval(() => {
@@ -187,7 +187,7 @@
                 let tr = _("tr");
                 let td = _("td");
                 tr.appendChild(td);
-                td.innerText = "@"+friend;
+                td.innerText = "@" + friend;
                 friendsTable.appendChild(tr);
             }
         }
@@ -257,32 +257,39 @@
             xhttp.open("GET", url, true);
             xhttp.send();
         }
-        function getStatusUpdate(postId,userId,friendId) {
+        function getStatusUpdate(postId, userId, friendId) {
             var xhttp = new XMLHttpRequest();
-            xhttp.open("GET", "/getPost?postDetails="+userId+"___"+friendId+"___"+postId, true);
+            xhttp.open("GET", "/getPost?postDetails=" + userId + "___" + friendId + "___" + postId, true);
             xhttp.responseType = 'blob';
             xhttp.onload = function () {
                 if (xhttp.status === 200) {
+                    const contentType = xhttp.getResponseHeader("Content-Type");
                     const blob = xhttp.response;
                     let myPosts = $("#myPosts");
                     let tr0 = document.createElement("tr");
                     let td0 = document.createElement("td");
-                    td0.innerText = "@"+userId;
+                    td0.innerText = "@" + userId;
                     tr0.appendChild(td0);
-                    let tr = document.createElement("tr");
-                    let td = document.createElement("td");
-                    tr.appendChild(td);
-                    let img = document.createElement("img");
-                    td.appendChild(img);
-                    img.src = URL.createObjectURL(blob);
-                    const caption = xhttp.getResponseHeader("caption");
                     let tr00 = document.createElement("tr");
                     let td00 = document.createElement("td");
-                    td00.innerText = caption;
                     tr00.appendChild(td00);
                     myPosts.appendChild(tr0);
                     myPosts.appendChild(tr00);
-                    myPosts.appendChild(tr);
+                    if (contentType == "text/plain") {
+                        blob.text().then((data)=>{
+                            td00.innerText = data;
+                        });
+                    } else {
+                        const caption = xhttp.getResponseHeader("caption");
+                        td00.innerText = caption;
+                        let tr = document.createElement("tr");
+                        let td = document.createElement("td");
+                        tr.appendChild(td);
+                        let img = document.createElement("img");
+                        td.appendChild(img);
+                        img.src = URL.createObjectURL(blob);
+                        myPosts.appendChild(tr);
+                    }
                 } else {
                     console.error('Error fetching image');
                 }
