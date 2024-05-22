@@ -6,6 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Honest Social Net</title>
     <style>
+        textarea,input[type='text'] {
+            background-color:bisque;
+            outline: none;
+            border: 1px solid lightblue;
+        }
+        input[type='button'] {
+            color: white;
+            background-color: blue;
+            border: none;
+        }
+        input[type='button']:active {
+            color: black;
+        }
+        input[type='button']:disabled {
+            color: gray;
+            background-color: darkgray;
+        }
         table {
             margin-left: auto;
             margin-right: auto;
@@ -67,6 +84,19 @@
             color: white !important;
             border-radius: 10px;
             width: 60px;
+        }
+
+        .individualPostTable {
+            border: 1px solid lightblue;
+            width: 55%;
+            margin-bottom: 10px;
+        }
+        .individualPostTable tr:nth-child(1) {
+            color: yellow;
+            background-color: black;
+        }
+        .individualPostTable:hover {
+            border: 1px solid lightgreen;
         }
     </style>
 </head>
@@ -194,7 +224,11 @@
         function postStatus() {
             let image = $("#image");
             const imageFile = image.files[0];
-            let caption = $("#caption").value;
+            let caption = $("#caption").value.trim();
+            if(caption=="") {
+                alert("Can't post without caption");
+                return;
+            }
             const formData = new FormData();
             if (imageFile) {
                 formData.append('image', imageFile);
@@ -266,6 +300,13 @@
                     const contentType = xhttp.getResponseHeader("Content-Type");
                     const blob = xhttp.response;
                     let myPosts = $("#myPosts");
+                    let childTable = document.createElement("table");
+                    childTable.setAttribute("class","individualPostTable");
+                    let childTableTr = document.createElement("tr");
+                    let childTableTd = document.createElement("td");
+                    childTableTd.appendChild(childTable);
+                    childTableTr.appendChild(childTableTd);
+                    myPosts.appendChild(childTableTr);
                     let tr0 = document.createElement("tr");
                     let td0 = document.createElement("td");
                     td0.innerText = "@" + userId;
@@ -273,8 +314,8 @@
                     let tr00 = document.createElement("tr");
                     let td00 = document.createElement("td");
                     tr00.appendChild(td00);
-                    myPosts.appendChild(tr0);
-                    myPosts.appendChild(tr00);
+                    childTable.appendChild(tr0);
+                    childTable.appendChild(tr00);
                     if (contentType == "text/plain") {
                         blob.text().then((data)=>{
                             td00.innerText = data;
@@ -288,7 +329,7 @@
                         let img = document.createElement("img");
                         td.appendChild(img);
                         img.src = URL.createObjectURL(blob);
-                        myPosts.appendChild(tr);
+                        childTable.appendChild(tr);
                     }
                 } else {
                     console.error('Error fetching image');
