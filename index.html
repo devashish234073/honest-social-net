@@ -87,25 +87,37 @@
         }
 
         .individualPostTable {
-            border: 1px solid lightblue;
             width: 55%;
-            margin-bottom: 15px;
+            margin-bottom: 25px;
             box-shadow: 5px 5px 5px gray;
+            border-radius: 10px;
         }
         .individualPostTable tr:nth-child(1) {
             color: yellow;
             background-color: black;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+        .individualPostTable tr:nth-child(1) td:nth-child(1) {
+            border-top-left-radius: 10px;
+        }
+        .individualPostTable tr:nth-child(1) td:nth-child(2) {
+            border-top-right-radius: 10px;
         }
         .individualPostTable:hover {
-            border: 1px solid lightgreen;
             box-shadow: 7px 7px 5px gray;
         }
 
         .likeBtn,.commentBtn {
-            width: 100%;
+            width: 90%;
+            border:none;
+            background-color: black;
+            color:white;
+            margin-bottom: 10px;
+            border-radius: 10px;
+        }
+        .likeBtn:hover,.commentBtn:hover {
             border:1px solid cyan;
-            color:gray;
-            background-color: lightblue;
         }
     </style>
 </head>
@@ -328,9 +340,10 @@
                     myPosts.appendChild(childTableTr);
                     let tr0 = document.createElement("tr");
                     let td0 = document.createElement("td");
-                    td0.setAttribute("colspan","2");
+                    let td0_1 = document.createElement("td");
                     td0.innerText = "@" + userId;
                     tr0.appendChild(td0);
+                    tr0.appendChild(td0_1);
                     let tr00 = document.createElement("tr");
                     let td00 = document.createElement("td");
                     td00.setAttribute("colspan","2");
