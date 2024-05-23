@@ -11,8 +11,8 @@ function populateData() {
     try {
         userData = JSON.parse(fs.readFileSync("data/users.json"));
         posts = JSON.parse(fs.readFileSync("data/posts.json"));
-    } catch(e) {
-        console.error("Unable to populate data from local",e);
+    } catch (e) {
+        console.error("Unable to populate data from local", e);
     }
     if (Object.keys(userData).length === 0) {
         console.log("no data found locally. Populating default users");
@@ -27,21 +27,21 @@ function populateData() {
 }
 
 function syncDataLocally() {
-    fs.writeFileSync("data/users.json",JSON.stringify(userData));
-    console.log("users synched locally at "+(new Date()));
-    fs.writeFileSync("data/posts.json",JSON.stringify(posts));
-    console.log("posts synched locally at "+(new Date()));
+    fs.writeFileSync("data/users.json", JSON.stringify(userData));
+    console.log("users synched locally at " + (new Date()));
+    fs.writeFileSync("data/posts.json", JSON.stringify(posts));
+    console.log("posts synched locally at " + (new Date()));
 }
 
-setInterval(function(){
+setInterval(function () {
     syncDataLocally();
-},60000);
+}, 60000);
 
 populateData();
 
 let server = http.createServer((req, res) => {
     const cookieHeader = req.headers.cookie;
-    if(!cookieHeader) {
+    if (!cookieHeader) {
         console.log("new cookie set");
         const expires = new Date();
         expires.setFullYear(expires.getFullYear() + 100);
@@ -71,14 +71,20 @@ let server = http.createServer((req, res) => {
                     let friendData = userData[friendId];
                     for (let p = 0; p < friendData["posts"].length; p++) {
                         let postId = friendData["posts"][p];
-                        userData[userId]["friendsPosts"].push({"friendId":friendId,"postId":postId});
+                        userData[userId]["friendsPosts"].push({ "friendId": friendId, "postId": postId });
                         if (p > 3) {//at most 3 posts from a friend in timeline
                             break;
                         }
                     }
                 }
             }
-            html = html.replace("__PLACEHOLDER__", JSON.stringify(userData[userId]));
+            let subUserData = { "id": userId, 
+                                "friendRequests": userData[userId].friendRequests, 
+                                "friends": userData[userId].friends, 
+                                "posts": userData[userId].posts, 
+                                "friendsPosts": userData[userId].friendsPosts, 
+                                "notifications": userData[userId].notifications };
+            html = html.replace("__PLACEHOLDER__", JSON.stringify(subUserData));
             res.end(html);
         });
     } else if (req.url.indexOf("/getNotifications?userId=") == 0) {
@@ -158,7 +164,7 @@ let server = http.createServer((req, res) => {
                 console.log("@" + userId + " ACCEPTED friend request of @" + friendId + " total number of friends changed from " + lenB4 + " to " + lenAfter);
             }
             userData[userId]["friendRequests"].splice(userData[userId]["friendRequests"].indexOf(friendId), 1);
-            res.end(JSON.stringify({"friendRequests":userData[userId]["friendRequests"],"friends":userData[userId]["friends"]}));
+            res.end(JSON.stringify({ "friendRequests": userData[userId]["friendRequests"], "friends": userData[userId]["friends"] }));
         }
     } else if (req.url.indexOf("/rejectFriendReq?friendId=") == 0) {
         let queryString = req.url.replace("/rejectFriendReq?friendId=", "").split("___");
@@ -182,24 +188,24 @@ let server = http.createServer((req, res) => {
                 res.end("{}");
             } else {
                 let post = posts[postId];
-                if(!post) {
+                if (!post) {
                     res.end("{}");
                 } else {
                     let image = null;
-                    if(post.visibility==EVERYONE) {
+                    if (post.visibility == EVERYONE) {
                         image = post.image;
                     }
-                    if(image!=null) {
-                        fs.readFile("uploads/"+image, (err, data) => {
+                    if (image != null) {
+                        fs.readFile("uploads/" + image, (err, data) => {
                             if (err) {
                                 res.status(500).send('Error reading the image file');
                             } else {
-                                res.writeHead(200, {'Content-Type': 'image/jpeg','caption':post.caption});
+                                res.writeHead(200, { 'Content-Type': 'image/jpeg', 'caption': post.caption,'date':post.date });
                                 res.end(data);
                             }
                         });
                     } else {
-                        res.writeHead(200, {'Content-Type': 'text/plain'});
+                        res.writeHead(200, { 'Content-Type': 'text/plain','date':post.date });
                         res.end(post.caption);
                     }
                 }
@@ -231,7 +237,7 @@ let server = http.createServer((req, res) => {
                     const dispositionMatch3 = headers.match(/Content-Disposition: form-data; name="userId"/);
                     if (dispositionMatch) {
                         fileName = dispositionMatch[2].split(".");
-                        fileName = generateUUID()+"."+fileName[fileName.length-1];
+                        fileName = generateUUID() + "." + fileName[fileName.length - 1];
                         const content = rawBody.slice(0, rawBody.lastIndexOf('\r\n'));
                         const buffer = Buffer.from(content, 'binary');
 
@@ -242,24 +248,24 @@ let server = http.createServer((req, res) => {
                                 return;
                             }
                         });
-                    } else if(dispositionMatch2) {
+                    } else if (dispositionMatch2) {
                         const name = dispositionMatch2[0];
-                        if(name.indexOf("name=\"caption\"")>-1) {
+                        if (name.indexOf("name=\"caption\"") > -1) {
                             caption = rawBody.trim();
                         }
-                    } else if(dispositionMatch3) {
+                    } else if (dispositionMatch3) {
                         const name = dispositionMatch3[0];
-                        if(name.indexOf("name=\"userId\"")>-1) {
+                        if (name.indexOf("name=\"userId\"") > -1) {
                             userId = rawBody.trim();
                         }
                     }
                 }
             });
             let postId = generateUUID2();
-            let post = {"id":postId,"image":fileName,"caption":caption,"visibility":EVERYONE,"userId":userId};
+            let post = { "id": postId, "image": fileName, "caption": caption, "visibility": EVERYONE, "userId": userId,"date":(new Date()) };
             userData[userId]["posts"].push(postId);
             posts[postId] = post;
-            console.log("status update",post);
+            console.log("status update", post);
             res.writeHead(200, { 'Content-Type': 'text/plain' });
             res.end('success');
         });
