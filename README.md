@@ -16,6 +16,10 @@ The accept and reject friend request login is(For ACCEPT the friendId is removed
 
 ![image](https://github.com/devashish234073/honest-social-net/assets/20777854/33427fc8-816f-4116-ba75-2fc4c0896934)
 
+UI as of 23rd May 2023:
+
+![image](https://github.com/devashish234073/honest-social-net/assets/20777854/4416e1d7-314a-4ccf-bc12-296f87c386c1)
+
 
 Also planning to implement the feature where after liking a picture post the picture content will change , i.e. interactive like feature.
 
