@@ -4,6 +4,8 @@ A social media world without password where fellow humans trust each others and 
 
 User id you should choose such a unique that no one in other part of world should be able to think otherwise you can login to theirs.
 
+Video of initial implementation: https://www.youtube.com/watch?v=xUR8KqrOigw
+
 This is the signIn vs signUp logic:
 
 ![image](https://github.com/devashish234073/honest-social-net/assets/20777854/3d5a11f1-2974-4fa0-ba37-0d68bc26a356)
