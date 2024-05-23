@@ -213,6 +213,63 @@ let server = http.createServer((req, res) => {
         } else {
             res.end("{}");
         }
+    } else if (req.url.indexOf("/likePost?postDetails=") == 0) {
+        let postDetails = req.url.replace("/likePost?postDetails=", "");
+        postDetails = postDetails.split("___");
+        if (postDetails.length == 3) {
+            let userId = postDetails[0];
+            let friendId = postDetails[1];//whose post it is
+            let postId = postDetails[2];
+            if (!userData[userId]) {
+                res.end("[]");
+            } else {
+                let post = posts[postId];
+                if (!post) {
+                    res.end("[]");
+                } else {
+                    if (post.visibility == EVERYONE) {
+                        if(!post["likes"]){
+                            post["likes"]=[];
+                        }
+                        if(post["likes"].indexOf(userId)==-1) {
+                            post["likes"].push(userId);//like
+                        } else {
+                            post["likes"].splice(post["likes"].indexOf(userId), 1);//unlike
+                        }
+                        res.end(JSON.stringify(post["likes"]));
+                    }
+                }
+            }
+        } else {
+            res.end("[]");
+        }
+    } else if (req.url.indexOf("/commentOnPost?postDetails=") == 0) {
+        let postDetails = req.url.replace("/commentOnPost?postDetails=", "");
+        postDetails = postDetails.split("___");
+        if (postDetails.length == 4) {
+            let userId = postDetails[0];
+            let friendId = postDetails[1];//whose post it is
+            let postId = postDetails[2];
+            let comment = postDetails[2];
+            if (!userData[userId]) {
+                res.end("[]");
+            } else {
+                let post = posts[postId];
+                if (!post) {
+                    res.end("[]");
+                } else {
+                    if (post.visibility == EVERYONE) {
+                        if(!post["comments"]){
+                            post["comments"]=[];
+                        }
+                        post["comments"].push({"user":userId,"comment":comment});
+                        res.end(JSON.stringify(post["comments"]));
+                    }
+                }
+            }
+        } else {
+            res.end("[]");
+        }
     } else if (req.method === 'POST' && req.url === '/postStatus') {
         const boundary = req.headers['content-type'].split('; ')[1].replace('boundary=', '');
         let body = '';
@@ -262,7 +319,7 @@ let server = http.createServer((req, res) => {
                 }
             });
             let postId = generateUUID2();
-            let post = { "id": postId, "image": fileName, "caption": caption, "visibility": EVERYONE, "userId": userId,"date":(new Date()) };
+            let post = { "id": postId, "image": fileName, "caption": caption, "visibility": EVERYONE, "userId": userId,"date":(new Date()),"likes":[],"comments":[] };
             userData[userId]["posts"].push(postId);
             posts[postId] = post;
             console.log("status update", post);
