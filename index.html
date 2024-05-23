@@ -100,6 +100,13 @@
             border: 1px solid lightgreen;
             box-shadow: 7px 7px 5px gray;
         }
+
+        .likeBtn,.commentBtn {
+            width: 100%;
+            border:1px solid cyan;
+            color:gray;
+            background-color: lightblue;
+        }
     </style>
 </head>
 
@@ -293,6 +300,16 @@
             xhttp.open("GET", url, true);
             xhttp.send();
         }
+        function likePost(postId) {
+            return function(){
+                alert("will like "+postId);
+            }
+        }
+        function commentOnPost(postId) {
+            return function(){
+                alert("will add a comment on post "+postId);
+            }
+        }
         function getStatusUpdate(postId, userId, friendId) {
             var xhttp = new XMLHttpRequest();
             xhttp.open("GET", "/getPost?postDetails=" + userId + "___" + friendId + "___" + postId, true);
@@ -311,10 +328,12 @@
                     myPosts.appendChild(childTableTr);
                     let tr0 = document.createElement("tr");
                     let td0 = document.createElement("td");
+                    td0.setAttribute("colspan","2");
                     td0.innerText = "@" + userId;
                     tr0.appendChild(td0);
                     let tr00 = document.createElement("tr");
                     let td00 = document.createElement("td");
+                    td00.setAttribute("colspan","2");
                     tr00.appendChild(td00);
                     childTable.appendChild(tr0);
                     childTable.appendChild(tr00);
@@ -327,12 +346,29 @@
                         td00.innerText = caption;
                         let tr = document.createElement("tr");
                         let td = document.createElement("td");
+                        td.setAttribute("colspan","2");
                         tr.appendChild(td);
                         let img = document.createElement("img");
                         td.appendChild(img);
                         img.src = URL.createObjectURL(blob);
                         childTable.appendChild(tr);
                     }
+                    let tr = document.createElement("tr");
+                    let td_0 = document.createElement("td");
+                    let td_1 = document.createElement("td");
+                    let likeBtn = document.createElement("button");
+                    let commentBtn = document.createElement("button");
+                    td_0.appendChild(likeBtn);
+                    likeBtn.innerText = "Like";
+                    likeBtn.setAttribute("class","likeBtn");
+                    commentBtn.innerText = "Comment";
+                    commentBtn.setAttribute("class","commentBtn");
+                    likeBtn.addEventListener("click",likePost(postId));
+                    commentBtn.addEventListener("click",commentOnPost(postId));
+                    td_1.appendChild(commentBtn);
+                    tr.appendChild(td_0);
+                    tr.appendChild(td_1);
+                    childTable.appendChild(tr);
                 } else {
                     console.error('Error fetching image');
                 }
