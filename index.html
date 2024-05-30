@@ -6,23 +6,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Honest Social Net</title>
     <style>
-        textarea,input[type='text'] {
-            background-color:bisque;
+        textarea,
+        input[type='text'] {
+            background-color: bisque;
             outline: none;
             border: 1px solid lightblue;
         }
+
         input[type='button'] {
             color: white;
             background-color: blue;
             border: none;
         }
+
         input[type='button']:active {
             color: black;
         }
+
         input[type='button']:disabled {
             color: gray;
             background-color: darkgray;
         }
+
         table {
             margin-left: auto;
             margin-right: auto;
@@ -92,32 +97,39 @@
             box-shadow: 5px 5px 5px gray;
             border-radius: 10px;
         }
+
         .individualPostTable tr:nth-child(1) {
             color: yellow;
             background-color: black;
             border-top-left-radius: 10px;
             border-top-right-radius: 10px;
         }
+
         .individualPostTable tr:nth-child(1) td:nth-child(1) {
             border-top-left-radius: 10px;
         }
+
         .individualPostTable tr:nth-child(1) td:nth-child(2) {
             border-top-right-radius: 10px;
         }
+
         .individualPostTable:hover {
             box-shadow: 7px 7px 5px gray;
         }
 
-        .likeBtn,.commentBtn {
+        .likeBtn,
+        .commentBtn {
             width: 90%;
-            border:none;
+            border: none;
             background-color: black;
-            color:white;
+            color: white;
             margin-bottom: 10px;
             border-radius: 10px;
         }
-        .likeBtn:hover,.commentBtn:hover {
-            border:1px solid cyan;
+
+        .likeBtn:hover,
+        .commentBtn:hover {
+            border: 1px solid cyan;
         }
     </style>
 </head>
@@ -246,7 +258,7 @@
             let image = $("#image");
             const imageFile = image.files[0];
             let caption = $("#caption").value.trim();
-            if(caption=="") {
+            if (caption == "") {
                 alert("Can't post without caption");
                 return;
             }
@@ -313,13 +325,17 @@
             xhttp.send();
         }
         function likePost(postId) {
-            return function(){
-                alert("will like "+postId);
+            return function () {
+                callGetApi("/likePost?postDetails=" + postId + "___" + user.id, (resp) => {
+                    console.log("like response",resp);
+                });
             }
         }
         function commentOnPost(postId) {
-            return function(){
-                alert("will add a comment on post "+postId);
+            return function () {
+                callGetApi("/likePost?postDetails=" + postId + "___" + user.id, (resp) => {
+                    console.log("like response",resp);
+                });
             }
         }
         function getStatusUpdate(postId, userId, friendId) {
@@ -332,7 +348,7 @@
                     const blob = xhttp.response;
                     let myPosts = $("#myPosts");
                     let childTable = document.createElement("table");
-                    childTable.setAttribute("class","individualPostTable");
+                    childTable.setAttribute("class", "individualPostTable");
                     let childTableTr = document.createElement("tr");
                     let childTableTd = document.createElement("td");
                     childTableTd.appendChild(childTable);
@@ -348,12 +364,12 @@
                     tr0.appendChild(td0_1);
                     let tr00 = document.createElement("tr");
                     let td00 = document.createElement("td");
-                    td00.setAttribute("colspan","2");
+                    td00.setAttribute("colspan", "2");
                     tr00.appendChild(td00);
                     childTable.appendChild(tr0);
                     childTable.appendChild(tr00);
                     if (contentType == "text/plain") {
-                        blob.text().then((data)=>{
+                        blob.text().then((data) => {
                             td00.innerText = data;
                         });
                     } else {
@@ -361,7 +377,7 @@
                         td00.innerText = caption;
                         let tr = document.createElement("tr");
                         let td = document.createElement("td");
-                        td.setAttribute("colspan","2");
+                        td.setAttribute("colspan", "2");
                         tr.appendChild(td);
                         let img = document.createElement("img");
                         td.appendChild(img);
@@ -374,12 +390,13 @@
                     let likeBtn = document.createElement("button");
                     let commentBtn = document.createElement("button");
                     td_0.appendChild(likeBtn);
-                    likeBtn.innerText = "Like";
-                    likeBtn.setAttribute("class","likeBtn");
+                    const likes = JSON.parse(xhttp.getResponseHeader("likes"));
+                    likeBtn.innerText = "Like ("+likes.length+")";
+                    likeBtn.setAttribute("class", "likeBtn");
                     commentBtn.innerText = "Comment";
-                    commentBtn.setAttribute("class","commentBtn");
-                    likeBtn.addEventListener("click",likePost(postId));
-                    commentBtn.addEventListener("click",commentOnPost(postId));
+                    commentBtn.setAttribute("class", "commentBtn");
+                    likeBtn.addEventListener("click", likePost(postId));
+                    commentBtn.addEventListener("click", commentOnPost(postId));
                     td_1.appendChild(commentBtn);
                     tr.appendChild(td_0);
                     tr.appendChild(td_1);

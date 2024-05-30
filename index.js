@@ -195,17 +195,18 @@ let server = http.createServer((req, res) => {
                     if (post.visibility == EVERYONE) {
                         image = post.image;
                     }
+                    let likes = JSON.stringify(post["likes"]?post["likes"]:[]);
                     if (image != null) {
                         fs.readFile("uploads/" + image, (err, data) => {
                             if (err) {
                                 res.status(500).send('Error reading the image file');
                             } else {
-                                res.writeHead(200, { 'Content-Type': 'image/jpeg', 'caption': post.caption,'date':post.date });
+                                res.writeHead(200, { 'Content-Type': 'image/jpeg', 'caption': post.caption,'date':post.date,'likes':likes });
                                 res.end(data);
                             }
                         });
                     } else {
-                        res.writeHead(200, { 'Content-Type': 'text/plain','date':post.date });
+                        res.writeHead(200, { 'Content-Type': 'text/plain','date':post.date,'likes':likes });
                         res.end(post.caption);
                     }
                 }
@@ -216,10 +217,10 @@ let server = http.createServer((req, res) => {
     } else if (req.url.indexOf("/likePost?postDetails=") == 0) {
         let postDetails = req.url.replace("/likePost?postDetails=", "");
         postDetails = postDetails.split("___");
-        if (postDetails.length == 3) {
-            let userId = postDetails[0];
-            let friendId = postDetails[1];//whose post it is
-            let postId = postDetails[2];
+        if (postDetails.length == 2) {
+            let userId = postDetails[1];
+            //let friendId = postDetails[1];//retrieve it from post id
+            let postId = postDetails[0];
             if (!userData[userId]) {
                 res.end("[]");
             } else {
@@ -246,10 +247,10 @@ let server = http.createServer((req, res) => {
     } else if (req.url.indexOf("/commentOnPost?postDetails=") == 0) {
         let postDetails = req.url.replace("/commentOnPost?postDetails=", "");
         postDetails = postDetails.split("___");
-        if (postDetails.length == 4) {
-            let userId = postDetails[0];
-            let friendId = postDetails[1];//whose post it is
-            let postId = postDetails[2];
+        if (postDetails.length == 3) {
+            let userId = postDetails[1];
+            //let friendId = postDetails[1];//retrieve it from post id
+            let postId = postDetails[0];
             let comment = postDetails[2];
             if (!userData[userId]) {
                 res.end("[]");
