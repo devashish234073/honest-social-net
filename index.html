@@ -122,6 +122,15 @@
             border-radius: 10px;
         }
 
+        .date {
+            font-size:11px;
+            color:lightgreen;
+        }
+
+        .date:hover {
+            color:cyan;
+        }
+
         .likeBtn,
         .commentBtn {
             border: none;
@@ -393,7 +402,8 @@
                     let td0 = document.createElement("td");
                     let td0_1 = document.createElement("td");
                     const date = xhttp.getResponseHeader("date");
-                    td0_1.innerText = date;
+                    td0_1.innerText = new Date(date);
+                    td0_1.setAttribute("class","date");
                     td0.innerText = "@" + userId;
                     tr0.appendChild(td0);
                     tr0.appendChild(td0_1);
