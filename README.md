@@ -28,9 +28,7 @@ Added like button counter and on hover shows who all liked:
 
 UI as of 31st May 2024:
 
-![image](https://github.com/devashish234073/honest-social-net/assets/20777854/9feecb46-de54-49c5-b393-79eb9de64f26)
-
-
+![image](https://github.com/devashish234073/honest-social-net/assets/20777854/fbac9fdb-1d89-4633-a936-db96efb16ccd)
 
 Also planning to implement the feature where after liking a picture post the picture content will change , i.e. interactive like feature.
 
