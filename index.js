@@ -243,7 +243,7 @@ let server = http.createServer((req, res) => {
                             notification = "post "+postId+" un-liked by "+userId;
                             console.log(userId+" un-liked post of "+post.userId);
                         }
-                        if(notification!=null && postAuthor) {
+                        if(notification!=null && postAuthor && post.userId!=userId) {
                             if(postAuthor["notifications"].indexOf(notification)>-1) {
                                 postAuthor["notifications"].splice(postAuthor["notifications"].indexOf(notification),1);
                             }
