@@ -117,14 +117,31 @@
             box-shadow: 7px 7px 5px gray;
         }
 
+        .likeBtn {
+            width: 90%;
+            border-radius: 10px;
+        }
+
         .likeBtn,
         .commentBtn {
-            width: 90%;
             border: none;
             background-color: black;
             color: white;
             margin-bottom: 10px;
-            border-radius: 10px;
+        }
+
+        .commentBox {
+            height: 15px;
+            border-top-left-radius: 10px;
+            border-bottom-left-radius: 10px;
+            width:69% !important;
+        }
+
+        .commentBtn {
+            height: 18px;
+            border-top-right-radius: 10px;
+            border-bottom-right-radius: 10px;
+            width:29% !important;
         }
 
         #likedByYou {
@@ -349,7 +366,7 @@
                 });
             }
         }
-        function commentOnPost(postId) {
+        function commentOnPost(postId,commentBox) {
             return function () {
                 callGetApi("/likePost?postDetails=" + postId + "___" + user.id, (resp) => {
                     console.log("like response", resp);
@@ -406,6 +423,9 @@
                     let td_0 = document.createElement("td");
                     let td_1 = document.createElement("td");
                     let likeBtn = document.createElement("button");
+                    let commentBox = document.createElement("input");
+                    commentBox.setAttribute("type","text");
+                    commentBox.setAttribute("class","commentBox");
                     let commentBtn = document.createElement("button");
                     td_0.appendChild(likeBtn);
                     const likes = JSON.parse(xhttp.getResponseHeader("likes"));
@@ -414,7 +434,8 @@
                     commentBtn.innerText = "Comment";
                     commentBtn.setAttribute("class", "commentBtn");
                     likeBtn.addEventListener("click", likePost(postId, likeBtn));
-                    commentBtn.addEventListener("click", commentOnPost(postId));
+                    commentBtn.addEventListener("click", commentOnPost(postId,commentBox));
+                    td_1.appendChild(commentBox);
                     td_1.appendChild(commentBtn);
                     tr.appendChild(td_0);
                     tr.appendChild(td_1);
