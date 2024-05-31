@@ -225,17 +225,29 @@ let server = http.createServer((req, res) => {
                 res.end("[]");
             } else {
                 let post = posts[postId];
+                let postAuthor = userData[post.userId];
                 if (!post) {
                     res.end("[]");
                 } else {
+                    let notification = null;
                     if (post.visibility == EVERYONE) {
                         if(!post["likes"]){
                             post["likes"]=[];
                         }
                         if(post["likes"].indexOf(userId)==-1) {
                             post["likes"].push(userId);//like
+                            notification = "post "+postId+" liked by "+userId;
+                            console.log(userId+" liked post of "+post.userId);
                         } else {
                             post["likes"].splice(post["likes"].indexOf(userId), 1);//unlike
+                            notification = "post "+postId+" un-liked by "+userId;
+                            console.log(userId+" un-liked post of "+post.userId);
+                        }
+                        if(notification!=null && postAuthor) {
+                            if(postAuthor["notifications"].indexOf(notification)>-1) {
+                                postAuthor["notifications"].splice(postAuthor["notifications"].indexOf(notification),1);
+                            }
+                            postAuthor["notifications"].push(notification);
                         }
                         res.end(JSON.stringify(post["likes"]));
                     }
