@@ -2,15 +2,25 @@ let http = require("http");
 let fs = require("fs");
 const PORT = 9090;
 let userData = {};
+let userDataHash = null;
 let posts = {};
+let postsHash = null;
 const EVERYONE = "everyone";
 const PRIVATE = "private";
 const ONLYFRIENDS = "onlyfriends";
 
 function populateData() {
     try {
-        userData = JSON.parse(fs.readFileSync("data/users.json"));
-        posts = JSON.parse(fs.readFileSync("data/posts.json"));
+        let stringifiedUSerData = fs.readFileSync("data/users.json");
+        userData = JSON.parse(stringifiedUSerData);
+        hashObject(stringifiedUSerData).then(hash => {
+            userDataHash = hash;
+        });
+        let stringifiedPostData = fs.readFileSync("data/posts.json");
+        posts = JSON.parse(stringifiedPostData);
+        hashObject(stringifiedPostData).then(hash => {
+            postsHash = hash;
+        });
     } catch (e) {
         console.error("Unable to populate data from local", e);
     }
@@ -26,11 +36,36 @@ function populateData() {
     }
 }
 
+async function hashObject(jsonString) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(jsonString);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+    return hashHex;
+}
+
 function syncDataLocally() {
-    fs.writeFileSync("data/users.json", JSON.stringify(userData));
-    console.log("users synched locally at " + (new Date()));
-    fs.writeFileSync("data/posts.json", JSON.stringify(posts));
-    console.log("posts synched locally at " + (new Date()));
+    let stringifiedUSerData = JSON.stringify(userData);
+    hashObject(stringifiedUSerData).then(hash => {
+        if (userDataHash == null || userDataHash != hash) {
+            fs.writeFileSync("data/users.json", stringifiedUSerData);
+            console.log("users synched locally at " + (new Date()));
+            userDataHash = hash;
+        } else {
+            console.log("users sync cancelled. As no change is done");
+        }
+    });
+    let stringifiedPostData = JSON.stringify(posts);
+    hashObject(stringifiedPostData).then(hash => {
+        if (postsHash == null || postsHash != hash) {
+            fs.writeFileSync("data/posts.json", stringifiedPostData);
+            console.log("posts synched locally at " + (new Date()));
+            postsHash = hash;
+        } else {
+            console.log("posts sync cancelled. As no change is done");
+        }
+    });
 }
 
 setInterval(function () {
@@ -78,12 +113,14 @@ let server = http.createServer((req, res) => {
                     }
                 }
             }
-            let subUserData = { "id": userId, 
-                                "friendRequests": userData[userId].friendRequests, 
-                                "friends": userData[userId].friends, 
-                                "posts": userData[userId].posts, 
-                                "friendsPosts": userData[userId].friendsPosts, 
-                                "notifications": userData[userId].notifications };
+            let subUserData = {
+                "id": userId,
+                "friendRequests": userData[userId].friendRequests,
+                "friends": userData[userId].friends,
+                "posts": userData[userId].posts,
+                "friendsPosts": userData[userId].friendsPosts,
+                "notifications": userData[userId].notifications
+            };
             html = html.replace("__PLACEHOLDER__", JSON.stringify(subUserData));
             res.end(html);
         });
@@ -195,18 +232,18 @@ let server = http.createServer((req, res) => {
                     if (post.visibility == EVERYONE) {
                         image = post.image;
                     }
-                    let likes = JSON.stringify(post["likes"]?post["likes"]:[]);
+                    let likes = JSON.stringify(post["likes"] ? post["likes"] : []);
                     if (image != null) {
                         fs.readFile("uploads/" + image, (err, data) => {
                             if (err) {
                                 res.status(500).send('Error reading the image file');
                             } else {
-                                res.writeHead(200, { 'Content-Type': 'image/jpeg', 'caption': post.caption,'date':post.date,'likes':likes });
+                                res.writeHead(200, { 'Content-Type': 'image/jpeg', 'caption': post.caption, 'date': post.date, 'likes': likes });
                                 res.end(data);
                             }
                         });
                     } else {
-                        res.writeHead(200, { 'Content-Type': 'text/plain','date':post.date,'likes':likes });
+                        res.writeHead(200, { 'Content-Type': 'text/plain', 'date': post.date, 'likes': likes });
                         res.end(post.caption);
                     }
                 }
@@ -231,21 +268,21 @@ let server = http.createServer((req, res) => {
                 } else {
                     let notification = null;
                     if (post.visibility == EVERYONE) {
-                        if(!post["likes"]){
-                            post["likes"]=[];
+                        if (!post["likes"]) {
+                            post["likes"] = [];
                         }
-                        if(post["likes"].indexOf(userId)==-1) {
+                        if (post["likes"].indexOf(userId) == -1) {
                             post["likes"].push(userId);//like
-                            notification = "post "+postId+" liked by "+userId;
-                            console.log(userId+" liked post of "+post.userId);
+                            notification = "post " + postId + " liked by " + userId;
+                            console.log(userId + " liked post of " + post.userId);
                         } else {
                             post["likes"].splice(post["likes"].indexOf(userId), 1);//unlike
-                            notification = "post "+postId+" un-liked by "+userId;
-                            console.log(userId+" un-liked post of "+post.userId);
+                            notification = "post " + postId + " un-liked by " + userId;
+                            console.log(userId + " un-liked post of " + post.userId);
                         }
-                        if(notification!=null && postAuthor && post.userId!=userId) {
-                            if(postAuthor["notifications"].indexOf(notification)>-1) {
-                                postAuthor["notifications"].splice(postAuthor["notifications"].indexOf(notification),1);
+                        if (notification != null && postAuthor && post.userId != userId) {
+                            if (postAuthor["notifications"].indexOf(notification) > -1) {
+                                postAuthor["notifications"].splice(postAuthor["notifications"].indexOf(notification), 1);
                             }
                             postAuthor["notifications"].push(notification);
                         }
@@ -272,10 +309,10 @@ let server = http.createServer((req, res) => {
                     res.end("[]");
                 } else {
                     if (post.visibility == EVERYONE) {
-                        if(!post["comments"]){
-                            post["comments"]=[];
+                        if (!post["comments"]) {
+                            post["comments"] = [];
                         }
-                        post["comments"].push({"user":userId,"comment":comment});
+                        post["comments"].push({ "user": userId, "comment": comment });
                         res.end(JSON.stringify(post["comments"]));
                     }
                 }
@@ -332,7 +369,7 @@ let server = http.createServer((req, res) => {
                 }
             });
             let postId = generateUUID2();
-            let post = { "id": postId, "image": fileName, "caption": caption, "visibility": EVERYONE, "userId": userId,"date":(new Date()),"likes":[],"comments":[] };
+            let post = { "id": postId, "image": fileName, "caption": caption, "visibility": EVERYONE, "userId": userId, "date": (new Date()), "likes": [], "comments": [] };
             userData[userId]["posts"].push(postId);
             posts[postId] = post;
             console.log("status update", post);
