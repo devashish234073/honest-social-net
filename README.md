@@ -30,5 +30,10 @@ UI as of 31st May 2024:
 
 ![image](https://github.com/devashish234073/honest-social-net/assets/20777854/fbac9fdb-1d89-4633-a936-db96efb16ccd)
 
+Added smart sync to hash the existing data and compare and sync only when data changes:
+
+![image](https://github.com/devashish234073/honest-social-net/assets/20777854/a3f6de7b-0a23-4b5d-a03e-5eb5921aeb10)
+
+
 Also planning to implement the feature where after liking a picture post the picture content will change , i.e. interactive like feature.
 
