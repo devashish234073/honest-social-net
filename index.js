@@ -238,12 +238,12 @@ let server = http.createServer((req, res) => {
                             if (err) {
                                 res.status(500).send('Error reading the image file');
                             } else {
-                                res.writeHead(200, { 'Content-Type': 'image/jpeg', 'caption': post.caption, 'date': post.date, 'likes': likes });
+                                res.writeHead(200, { 'Content-Type': 'image/jpeg', 'caption': post.caption, 'date': post.date, 'likes': likes,'comments':JSON.stringify(post.comments) });
                                 res.end(data);
                             }
                         });
                     } else {
-                        res.writeHead(200, { 'Content-Type': 'text/plain', 'date': post.date, 'likes': likes });
+                        res.writeHead(200, { 'Content-Type': 'text/plain', 'date': post.date, 'likes': likes,'comments':JSON.stringify(post.comments) });
                         res.end(post.caption);
                     }
                 }
@@ -298,13 +298,13 @@ let server = http.createServer((req, res) => {
         postDetails = postDetails.split("___");
         if (postDetails.length == 3) {
             let userId = postDetails[1];
-            //let friendId = postDetails[1];//retrieve it from post id
             let postId = postDetails[0];
-            let comment = postDetails[2];
+            let comment = postDetails[2].split("%20").join(" ");
             if (!userData[userId]) {
                 res.end("[]");
             } else {
                 let post = posts[postId];
+                let postAuthor = userData[post.userId];
                 if (!post) {
                     res.end("[]");
                 } else {
@@ -313,6 +313,13 @@ let server = http.createServer((req, res) => {
                             post["comments"] = [];
                         }
                         post["comments"].push({ "user": userId, "comment": comment });
+                        let notification = userId+" commented '"+comment+"' on your post "+postId;
+                        if (notification != null && postAuthor && post.userId != userId) {
+                            if (postAuthor["notifications"].indexOf(notification) > -1) {
+                                postAuthor["notifications"].splice(postAuthor["notifications"].indexOf(notification), 1);
+                            }
+                            postAuthor["notifications"].push(notification);
+                        }
                         res.end(JSON.stringify(post["comments"]));
                     }
                 }

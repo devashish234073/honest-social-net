@@ -377,8 +377,12 @@
         }
         function commentOnPost(postId,commentBox) {
             return function () {
-                callGetApi("/likePost?postDetails=" + postId + "___" + user.id, (resp) => {
-                    console.log("like response", resp);
+                if(commentBox.value.trim()=="") {
+                    alert("Can't add empty comment");
+                    return;
+                }
+                callGetApi("/commentOnPost?postDetails=" + postId + "___" + user.id+"___"+commentBox.value, (resp) => {
+                    console.log("comment response", resp);
                 });
             }
         }
