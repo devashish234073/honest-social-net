@@ -98,6 +98,24 @@
             border-radius: 10px;
         }
 
+        .commentUsr {
+            color: blueviolet !important;
+            text-align: left !important;
+            font-weight: bold;
+            background-color: antiquewhite;
+            border-top-left-radius: 10px !important;
+            border-top-right-radius: 10px !important;
+        }
+
+        .commentTxt {
+            color: cadetblue;
+            text-align: right !important;
+            padding: 10px;
+            background-color: antiquewhite;
+            border-bottom-left-radius: 10px !important;
+            border-bottom-right-radius: 10px !important;
+        }
+
         .individualPostTable tr:nth-child(1) {
             color: yellow;
             background-color: black;
@@ -123,12 +141,12 @@
         }
 
         .date {
-            font-size:11px;
-            color:lightgreen;
+            font-size: 11px;
+            color: lightgreen;
         }
 
         .date:hover {
-            color:cyan;
+            color: cyan;
         }
 
         .likeBtn,
@@ -143,14 +161,14 @@
             height: 15px;
             border-top-left-radius: 10px;
             border-bottom-left-radius: 10px;
-            width:69% !important;
+            width: 69% !important;
         }
 
         .commentBtn {
             height: 18px;
             border-top-right-radius: 10px;
             border-bottom-right-radius: 10px;
-            width:29% !important;
+            width: 29% !important;
         }
 
         #likedByYou {
@@ -354,35 +372,37 @@
             xhttp.open("GET", url, true);
             xhttp.send();
         }
-        function updateLikeBtn(likes,likeBtn) {
+        function updateLikeBtn(likes, likeBtn) {
             likeBtn.innerText = "Like (" + likes.length + ")";
             if (likes.length == 0) {
                 likeBtn.setAttribute("title", "");
             } else {
                 likeBtn.setAttribute("title", "Liked by " + likes.join(", "));
             }
-            if(likes.indexOf(user.id)>-1) {
-                likeBtn.setAttribute("id","likedByYou");
+            if (likes.indexOf(user.id) > -1) {
+                likeBtn.setAttribute("id", "likedByYou");
             } else {
-                likeBtn.setAttribute("id","notLikedBYYou");
+                likeBtn.setAttribute("id", "notLikedBYYou");
             }
         }
         function likePost(postId, likeBtn) {
             return function () {
                 callGetApi("/likePost?postDetails=" + postId + "___" + user.id, (resp) => {
                     let likes = JSON.parse(resp);
-                    updateLikeBtn(likes,likeBtn);
+                    updateLikeBtn(likes, likeBtn);
                 });
             }
         }
-        function commentOnPost(postId,commentBox) {
+        function commentOnPost(postId, commentBox) {
             return function () {
-                if(commentBox.value.trim()=="") {
+                if (commentBox.value.trim() == "") {
                     alert("Can't add empty comment");
                     return;
                 }
-                callGetApi("/commentOnPost?postDetails=" + postId + "___" + user.id+"___"+commentBox.value, (resp) => {
+                callGetApi("/commentOnPost?postDetails=" + postId + "___" + user.id + "___" + commentBox.value, (resp) => {
                     console.log("comment response", resp);
+                    populateComments(postId, JSON.parse(resp));
+                    commentBox.value = "";
                 });
             }
         }
@@ -407,7 +427,7 @@
                     let td0_1 = document.createElement("td");
                     const date = xhttp.getResponseHeader("date");
                     td0_1.innerText = new Date(date);
-                    td0_1.setAttribute("class","date");
+                    td0_1.setAttribute("class", "date");
                     td0.innerText = "@" + userId;
                     tr0.appendChild(td0);
                     tr0.appendChild(td0_1);
@@ -438,27 +458,64 @@
                     let td_1 = document.createElement("td");
                     let likeBtn = document.createElement("button");
                     let commentBox = document.createElement("input");
-                    commentBox.setAttribute("type","text");
-                    commentBox.setAttribute("class","commentBox");
+                    commentBox.setAttribute("type", "text");
+                    commentBox.setAttribute("class", "commentBox");
                     let commentBtn = document.createElement("button");
                     td_0.appendChild(likeBtn);
                     const likes = JSON.parse(xhttp.getResponseHeader("likes"));
-                    updateLikeBtn(likes,likeBtn);
+                    updateLikeBtn(likes, likeBtn);
                     likeBtn.setAttribute("class", "likeBtn");
                     commentBtn.innerText = "Comment";
                     commentBtn.setAttribute("class", "commentBtn");
                     likeBtn.addEventListener("click", likePost(postId, likeBtn));
-                    commentBtn.addEventListener("click", commentOnPost(postId,commentBox));
+                    commentBtn.addEventListener("click", commentOnPost(postId, commentBox));
                     td_1.appendChild(commentBox);
                     td_1.appendChild(commentBtn);
                     tr.appendChild(td_0);
                     tr.appendChild(td_1);
                     childTable.appendChild(tr);
+                    //showing comments
+                    const comments = JSON.parse(xhttp.getResponseHeader("comments"));
+                    let commentTable = document.createElement("table");
+                    let commentTableTr = document.createElement("tr");
+                    let commentTableTd = document.createElement("td");
+                    commentTableTd.setAttribute("colspan", "2");
+                    childTable.appendChild(commentTableTr);
+                    commentTableTr.appendChild(commentTableTd);
+                    commentTableTd.appendChild(commentTable);
+                    populateComments(postId, comments, commentTable);
                 } else {
                     console.error('Error fetching image');
                 }
             };
             xhttp.send();
+        }
+        let commentsMap = {};
+        function populateComments(postId, comments, commentTable) {
+            if (!commentsMap[postId] && commentTable) {
+                commentsMap[postId] = commentTable;
+            }
+            if (!commentTable) {
+                commentTable = commentsMap[postId];
+            }
+            deleteAllRowsOfTable(commentTable);
+            if (comments && comments.length > 0) {
+                for (let cmntIndx = comments.length - 1; cmntIndx >= 0; cmntIndx--) {
+                    let commentRow0 = document.createElement("tr");
+                    let commentRow1 = document.createElement("tr");
+                    let commenttd0 = document.createElement("td");
+                    commenttd0.setAttribute("class", "commentUsr");
+                    let commenttd1 = document.createElement("td");
+                    commenttd1.setAttribute("class", "commentTxt");
+                    commenttd1.setAttribute("colspan", "2");
+                    commenttd0.innerText = comments[cmntIndx].user;
+                    commenttd1.innerText = comments[cmntIndx].comment;
+                    commentRow0.appendChild(commenttd0);
+                    commentRow1.appendChild(commenttd1);
+                    commentTable.appendChild(commentRow0);
+                    commentTable.appendChild(commentRow1);
+                }
+            }
         }
         $("#friendReqBtn").style.display = "none";
         function searchFriend() {
