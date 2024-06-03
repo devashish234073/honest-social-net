@@ -60,6 +60,15 @@
             font-size: 14px;
         }
 
+        .topTableContainer {
+            height: 80px;
+            overflow-y: auto;
+        }
+
+        .topTableContainer:hover {
+            height: 100%;
+        }
+
         #friendRequestsTable td,
         #notificationsTable td {
             color: yellow;
@@ -123,12 +132,24 @@
             border-top-right-radius: 10px;
         }
 
+        .commentTable {
+            width: 90%;
+        }
+
+        .commentTable td {
+            padding-left: 10px;
+        }
+
+        .emptyCommentCol {
+            height: 10px;
+        }
+
         .individualPostTable tr:nth-child(1) td:nth-child(1) {
-            border-top-left-radius: 10px;
+            border-top-left-radius: 7px;
         }
 
         .individualPostTable tr:nth-child(1) td:nth-child(2) {
-            border-top-right-radius: 10px;
+            border-top-right-radius: 7px;
         }
 
         .individualPostTable:hover {
@@ -179,33 +200,15 @@
         .commentBtn:hover {
             border: 1px solid cyan;
         }
+
+        .topMostTable {
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 
 <body>
-    <table class="topTable">
-        <tr>
-            <td>Notifications</td>
-            <td>Friends</td>
-            <td>Friend Requests</td>
-            <td>
-                <span id="signOut">Sign Out</span>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <table id="notificationsTable"></table>
-            </td>
-            <td>
-                <table id="friendsTable"></table>
-            </td>
-            <td>
-                <table id="friendRequestsTable"></table>
-            </td>
-            <td></td>
-        </tr>
-    </table>
-    <table>
+    <table class="topMostTable">
         <tr>
             <td colspan="3">
                 <h2>Welcome to Honest Social Net</h2>
@@ -213,12 +216,38 @@
             </td>
         </tr>
         <tr>
+            <td><input type="text" placeholder="search friend" id="friendId"><input type="button"
+                    onclick="searchFriend()" value="Search Friend"></td>
+        </tr>
+    </table>
+    <div class="topTableContainer">
+        <table class="topTable">
+            <tr>
+                <td>Notifications</td>
+                <td>Friends</td>
+                <td>Friend Requests</td>
+                <td>
+                    <span id="signOut">Sign Out</span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <table id="notificationsTable"></table>
+                </td>
+                <td>
+                    <table id="friendsTable"></table>
+                </td>
+                <td>
+                    <table id="friendRequestsTable"></table>
+                </td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+    <table>
+        <tr>
             <td>
                 <table>
-                    <tr>
-                        <td><input type="text" placeholder="search friend" id="friendId"><input type="button"
-                                onclick="searchFriend()" value="Search Friend"></td>
-                    </tr>
                     <tr>
                         <td id="friendReqBtnTd"><input type="button" value="" id="friendReqBtn"
                                 onclick="sendFriendRequest()"></td>
@@ -477,6 +506,7 @@
                     //showing comments
                     const comments = JSON.parse(xhttp.getResponseHeader("comments"));
                     let commentTable = document.createElement("table");
+                    commentTable.setAttribute("class","commentTable");
                     let commentTableTr = document.createElement("tr");
                     let commentTableTd = document.createElement("td");
                     commentTableTd.setAttribute("colspan", "2");
@@ -514,6 +544,12 @@
                     commentRow1.appendChild(commenttd1);
                     commentTable.appendChild(commentRow0);
                     commentTable.appendChild(commentRow1);
+                    //empty row and column:
+                    let commentRow2 = document.createElement("tr");
+                    let commenttd2 = document.createElement("td");
+                    commenttd2.setAttribute("class","emptyCommentCol");
+                    commentRow2.appendChild(commenttd2);
+                    commentTable.appendChild(commentRow2);
                 }
             }
         }
