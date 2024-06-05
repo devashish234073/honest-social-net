@@ -35,6 +35,14 @@
             width: 100%;
         }
 
+        .hoverlink:hover {
+            text-decoration: underline;
+        }
+
+        .highlighted {
+            background-color: aqua !important;
+        }
+
         td {
             height: 10px;
             text-align: center;
@@ -180,9 +188,10 @@
 
         .commentBox {
             height: 15px;
+            padding-left: 15px;
             border-top-left-radius: 10px;
             border-bottom-left-radius: 10px;
-            width: 69% !important;
+            width: 68% !important;
         }
 
         .commentBtn {
@@ -316,9 +325,39 @@
                 let td = _("td");
                 tr.appendChild(td);
                 td.innerText = notif;
+                if (notif.indexOf("post ") == 0 && notif.indexOf("un-liked by") > -1) {
+                    let notifSplit = notif.split("un-liked by");
+                    let postId = "post_" + notifSplit[0].replace("post ", "").trim().split("-").join("");
+                    addListenerToScrollToPost(td, postId);
+                } else if (notif.indexOf("post ") == 0 && notif.indexOf("liked by") > -1) {
+                    let notifSplit = notif.split("liked by");
+                    let postId = "post_" + notifSplit[0].replace("post ", "").trim().split("-").join("");
+                    addListenerToScrollToPost(td, postId);
+                } else if (notif.indexOf("commented") > -1 && notif.indexOf("on your post") > -1) {
+                    let notifSplit = notif.split("on your post");
+                    let postId = "post_" + notifSplit[1].trim().split("-").join("");
+                    addListenerToScrollToPost(td, postId);
+                }
                 notificationsTable.appendChild(tr);
             }
         }
+
+        function addListenerToScrollToPost(td, postId) {
+            td.setAttribute("class", "hoverlink");
+            setTimeout(()=>{
+                const postElement = document.querySelector("#" + postId);
+                td.setAttribute("title", postElement.innerText);
+            },1000);
+            td.addEventListener("click", () => {
+                const postElement = document.querySelector("#" + postId);
+                postElement.scrollIntoView({ behavior: 'smooth', inline: 'start' });
+                postElement.classList.add("highlighted");
+                setTimeout(() => {
+                    postElement.classList.remove("highlighted");
+                }, 1000);
+            });
+        }
+
         function populateFriendsTable(friends) {
             let friendsTable = $("#friendsTable");
             deleteAllRowsOfTable(friendsTable);
@@ -445,6 +484,7 @@
                     const blob = xhttp.response;
                     let myPosts = $("#myPosts");
                     let childTable = document.createElement("table");
+                    childTable.setAttribute("id", "post_" + postId.split("-").join(""));
                     childTable.setAttribute("class", "individualPostTable");
                     let childTableTr = document.createElement("tr");
                     let childTableTd = document.createElement("td");
@@ -506,7 +546,7 @@
                     //showing comments
                     const comments = JSON.parse(xhttp.getResponseHeader("comments"));
                     let commentTable = document.createElement("table");
-                    commentTable.setAttribute("class","commentTable");
+                    commentTable.setAttribute("class", "commentTable");
                     let commentTableTr = document.createElement("tr");
                     let commentTableTd = document.createElement("td");
                     commentTableTd.setAttribute("colspan", "2");
@@ -547,7 +587,7 @@
                     //empty row and column:
                     let commentRow2 = document.createElement("tr");
                     let commenttd2 = document.createElement("td");
-                    commenttd2.setAttribute("class","emptyCommentCol");
+                    commenttd2.setAttribute("class", "emptyCommentCol");
                     commentRow2.appendChild(commenttd2);
                     commentTable.appendChild(commentRow2);
                 }
