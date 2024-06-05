@@ -34,18 +34,15 @@ Added smart sync to hash the existing data and compare and sync only when data c
 
 ![image](https://github.com/devashish234073/honest-social-net/assets/20777854/a3f6de7b-0a23-4b5d-a03e-5eb5921aeb10)
 
+When only users data is changed and post data is unchanged then only users data is synched similarly for posts data too:
+
+![image](https://github.com/devashish234073/honest-social-net/assets/20777854/d1576d43-1241-4a4b-bdaa-5427c9521b1b)
+
 Update as of 5th June:
 
 Hovering over a liked/unliked or comment notifcation now shows the details of the post and clicking takes to the post:
 
 ![image](https://github.com/devashish234073/honest-social-net/assets/20777854/88dea5df-bbbf-42c0-8000-746c76a29940)
-
-
-When only users data is changed and post data is unchanged then only users data is synched similarly for posts data too:
-
-![image](https://github.com/devashish234073/honest-social-net/assets/20777854/d1576d43-1241-4a4b-bdaa-5427c9521b1b)
-
-
 
 Also planning to implement the feature where after liking a picture post the picture content will change , i.e. interactive like feature.
 
