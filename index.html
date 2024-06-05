@@ -117,6 +117,7 @@
 
         .commentUsr {
             color: blueviolet !important;
+            font-size: 10px;
             text-align: left !important;
             font-weight: bold;
             background-color: antiquewhite;
@@ -578,7 +579,7 @@
                     let commenttd1 = document.createElement("td");
                     commenttd1.setAttribute("class", "commentTxt");
                     commenttd1.setAttribute("colspan", "2");
-                    commenttd0.innerText = comments[cmntIndx].user;
+                    commenttd0.innerText = "["+new Date(comments[cmntIndx].date)+"] "+comments[cmntIndx].user;
                     commenttd1.innerText = comments[cmntIndx].comment;
                     commentRow0.appendChild(commenttd0);
                     commentRow1.appendChild(commenttd1);

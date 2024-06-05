@@ -312,7 +312,7 @@ let server = http.createServer((req, res) => {
                         if (!post["comments"]) {
                             post["comments"] = [];
                         }
-                        post["comments"].push({ "user": userId, "comment": comment });
+                        post["comments"].push({ "user": userId, "comment": comment,"date":(new Date()) });
                         let notification = userId+" commented '"+comment+"' on your post "+postId;
                         if (notification != null && postAuthor && post.userId != userId) {
                             if (postAuthor["notifications"].indexOf(notification) > -1) {
