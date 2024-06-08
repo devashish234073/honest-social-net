@@ -1,0 +1,79 @@
+package com.devashish.honest.social.net.honest_social_net.models;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "logged_in_user")
+public class LoggedInUser {
+	@Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
+	@ElementCollection(fetch = FetchType.EAGER)
+	@CollectionTable(name = "logged_in_user_friend_requests", joinColumns = @JoinColumn(name = "logged_in_user_id"))
+	@Column(name = "friend_requests")
+    private List<String> friendRequests;
+	@ElementCollection(fetch = FetchType.EAGER)
+	@CollectionTable(name = "logged_in_user_friends", joinColumns = @JoinColumn(name = "logged_in_user_id"))
+	@Column(name = "friends")
+    private List<String> friends;
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
+	@CollectionTable(name = "user_posts", joinColumns = @JoinColumn(name = "logged_in_user_id"))
+    private List<Post> posts;
+	@Column(name = "friends_posts")
+	@CollectionTable(name = "logged_in_user_friends_posts", joinColumns = @JoinColumn(name = "logged_in_user_id"))
+    private List<String> friendsPosts;
+	@ElementCollection(fetch = FetchType.EAGER)
+	@CollectionTable(name = "logged_in_user_notifications", joinColumns = @JoinColumn(name = "logged_in_user_id"))
+	@Column(name = "notification")
+    private List<String> notifications;
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
+	public List<String> getFriendRequests() {
+		return friendRequests;
+	}
+	public void setFriendRequests(List<String> friendRequests) {
+		this.friendRequests = friendRequests;
+	}
+	public List<String> getFriends() {
+		return friends;
+	}
+	public void setFriends(List<String> friends) {
+		this.friends = friends;
+	}
+	public List<String> getFriendsPosts() {
+		return friendsPosts;
+	}
+	public void setFriendsPosts(List<String> friendsPosts) {
+		this.friendsPosts = friendsPosts;
+	}
+	public List<String> getNotifications() {
+		return notifications;
+	}
+	public void setNotifications(List<String> notifications) {
+		this.notifications = notifications;
+	}
+	public List<Post> getPosts() {
+		return posts;
+	}
+	public void setPosts(List<Post> posts) {
+		this.posts = posts;
+	}
+	public void addPost(Post post) {
+		if(this.posts==null) {
+			this.posts = new ArrayList<Post>();
+		}
+		this.posts.add(post);
+	}
+	@Override
+	public String toString() {
+		return "LoggedInUser [id=" + id + ", friendRequests=" + friendRequests + ", friends=" + friends + ", posts="
+				+ posts + ", friendsPosts=" + friendsPosts + ", notifications=" + notifications + "]";
+	}
+}
