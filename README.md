@@ -1,6 +1,8 @@
 # honest-social-net
 
-A social media world without password where fellow humans trust each others and each are honest to login with their own userid.
+This is the nodejs version of the application for the java version please refer to the branch --> https://github.com/devashish234073/honest-social-net/tree/java-hibernate
+
+This is a social media world without password where fellow humans trust each others and each are honest to login with their own userid.
 
 User id you should choose such a unique that no one in other part of world should be able to think otherwise you can login to theirs.
 
