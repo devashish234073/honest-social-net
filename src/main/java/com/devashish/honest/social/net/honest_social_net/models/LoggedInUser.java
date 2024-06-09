@@ -9,7 +9,6 @@ import jakarta.persistence.*;
 @Table(name = "logged_in_user")
 public class LoggedInUser {
 	@Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 	@ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(name = "logged_in_user_friend_requests", joinColumns = @JoinColumn(name = "logged_in_user_id"))
@@ -29,6 +28,12 @@ public class LoggedInUser {
 	@CollectionTable(name = "logged_in_user_notifications", joinColumns = @JoinColumn(name = "logged_in_user_id"))
 	@Column(name = "notification")
     private List<String> notifications;
+	public LoggedInUser() {
+		
+	}
+	public LoggedInUser(String id) {
+		this.id = id;
+	}
 	public String getId() {
 		return id;
 	}
@@ -46,6 +51,12 @@ public class LoggedInUser {
 	}
 	public void setFriends(List<String> friends) {
 		this.friends = friends;
+	}
+	public void addFriend(String friendsId) {
+		if(this.friends==null) {
+			this.friends = new ArrayList<String>();
+		}
+		this.friends.add(friendsId);
 	}
 	public List<String> getFriendsPosts() {
 		return friendsPosts;

@@ -42,6 +42,10 @@ public class DaoService {
     public List<LoggedInUser> getAllUsers() {
         return userRepository.findAll();
     }
+    
+    public LoggedInUser getUserById(String id) {
+        return userRepository.findById(id).get();
+    }
 
     public List<Comment> getAllComments() {
         return commentRepository.findAll();
