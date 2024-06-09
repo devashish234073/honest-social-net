@@ -36,4 +36,26 @@ public class RestControllerClass {
 		}
 		return friendRequests;
 	}
+	
+	@GetMapping("searchFriend")
+	public String searchFriend(@RequestParam("friendId") String friendId,@RequestParam("userId") String userId) {
+		if(friendId.equals(userId)) {
+			return "You can't send friend request to yourself";
+		}
+		LoggedInUser friend = daoService.getUserById(friendId);
+		if(friend==null) {
+			return friendId+" Not found";
+		}
+		LoggedInUser user = daoService.getUserById(userId);
+		if(user.getFriends()!=null && user.getFriends().contains(friendId)) {
+			return friendId+" Found and is already your friend";
+		}
+		if(friend.getFriendRequests()!=null && friend.getFriendRequests().contains(userId)) {
+			return "You have alread sent friend request to "+friendId;
+		}
+		if(user.getFriendRequests()!=null && user.getFriendRequests().contains(friendId)) {
+			return "You have already have a frnd req from "+friendId;
+		}
+		return null;
+	}
 }

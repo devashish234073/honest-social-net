@@ -598,7 +598,7 @@
         $("#friendReqBtn").style.display = "none";
         function searchFriend() {
             let friendId = $("#friendId").value;
-            callGetApi("/searchFriend?friendId=" + friendId + "___" + user.id, (resp) => {
+            callGetApi("/searchFriend?friendId=" + friendId + "&userId=" + user.id, (resp) => {
                 $("#friendReqBtn").value = resp;
                 $("#friendReqBtn").style.display = "inline-block";
                 if (resp.indexOf("Send Friend Request") > -1) {
