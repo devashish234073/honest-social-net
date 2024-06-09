@@ -18,9 +18,9 @@ public class LoggedInUser {
 	@CollectionTable(name = "logged_in_user_friends", joinColumns = @JoinColumn(name = "logged_in_user_id"))
 	@Column(name = "friends")
     private List<String> friends;
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
+	@Column(name = "posts")
 	@CollectionTable(name = "user_posts", joinColumns = @JoinColumn(name = "logged_in_user_id"))
-    private List<Post> posts;
+    private List<String> posts;
 	@Column(name = "friends_posts")
 	@CollectionTable(name = "logged_in_user_friends_posts", joinColumns = @JoinColumn(name = "logged_in_user_id"))
     private List<String> friendsPosts;
@@ -70,17 +70,17 @@ public class LoggedInUser {
 	public void setNotifications(List<String> notifications) {
 		this.notifications = notifications;
 	}
-	public List<Post> getPosts() {
+	public List<String> getPosts() {
 		return posts;
 	}
-	public void setPosts(List<Post> posts) {
+	public void setPosts(List<String> posts) {
 		this.posts = posts;
 	}
 	public void addPost(Post post) {
 		if(this.posts==null) {
-			this.posts = new ArrayList<Post>();
+			this.posts = new ArrayList<String>();
 		}
-		this.posts.add(post);
+		this.posts.add(post.getId());
 	}
 	@Override
 	public String toString() {
