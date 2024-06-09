@@ -31,11 +31,6 @@ public class HonestSocialNetApplication {
 		user1.addFriend("user2");
 		user1.addFriend("user3");
 		daoService.saveUser(user1);
-		for(int i=0;i<user2.getFriends().size();i++) {
-			String friendId = user2.getFriends().get(i);
-			LoggedInUser friend = daoService.getUserById(friendId);
-			System.out.println(friend);
-		}
 		daoService.saveUser(user2);
 		daoService.saveUser(user3);
 		System.out.println(daoService.getAllUsers());
