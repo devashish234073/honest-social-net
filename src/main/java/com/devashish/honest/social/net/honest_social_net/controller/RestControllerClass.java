@@ -75,7 +75,7 @@ public class RestControllerClass {
 			return validationResult;
 		}
 		LoggedInUser friend = daoService.getUserById(friendId);
-		friend.addFriendRequest(friendId);
+		friend.addFriendRequest(userId);
 		friend.addNotification("You have one friend request from @"+userId);
 		daoService.saveUser(friend);
 		return "Frend Request sent to " + friendId;
