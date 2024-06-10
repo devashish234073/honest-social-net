@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DaoService {
@@ -44,7 +45,8 @@ public class DaoService {
     }
     
     public LoggedInUser getUserById(String id) {
-        return userRepository.findById(id).get();
+    	Optional<LoggedInUser> user = userRepository.findById(id);
+        return user.isEmpty()?null:user.get();
     }
 
     public List<Comment> getAllComments() {
