@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.devashish.honest.social.net.honest_social_net.models.FriendsAndFriendRequests;
 import com.devashish.honest.social.net.honest_social_net.models.LoggedInUser;
 import com.devashish.honest.social.net.honest_social_net.services.DaoService;
 
@@ -92,13 +93,16 @@ public class RestControllerClass {
 	}
 	
 	@GetMapping("acceptFriendReq")
-	public List<String> acceptFriendReq(@RequestParam("friendId") String friendId,@RequestParam("userId") String userId) {
+	public FriendsAndFriendRequests acceptFriendReq(@RequestParam("friendId") String friendId,@RequestParam("userId") String userId) {
 		LoggedInUser user = daoService.getUserById(userId);
 		if(user!=null && user.getFriendRequests()!=null && user.getFriendRequests().contains(friendId)) {
 			user.getFriendRequests().remove(friendId);
 			user.addFriend(friendId);
 			daoService.saveUser(user);
 		}
-		return user.getFriends();
+		FriendsAndFriendRequests friendsAndFriendRequests = new FriendsAndFriendRequests();
+		friendsAndFriendRequests.setFriendRequests(user.getFriendRequests()==null?new ArrayList<String>():user.getFriendRequests());
+		friendsAndFriendRequests.setFriends(user.getFriends()==null?new ArrayList<String>():user.getFriends());
+		return friendsAndFriendRequests;
 	}
 }
