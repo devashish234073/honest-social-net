@@ -80,4 +80,25 @@ public class RestControllerClass {
 		daoService.saveUser(friend);
 		return "Frend Request sent to " + friendId;
 	}
+	
+	@GetMapping("rejectFriendReq")
+	public List<String> rejectFriendReq(@RequestParam("friendId") String friendId,@RequestParam("userId") String userId) {
+		LoggedInUser user = daoService.getUserById(userId);
+		if(user!=null && user.getFriendRequests()!=null && user.getFriendRequests().contains(friendId)) {
+			user.getFriendRequests().remove(friendId);
+		}
+		daoService.saveUser(user);
+		return user.getFriends();
+	}
+	
+	@GetMapping("acceptFriendReq")
+	public List<String> acceptFriendReq(@RequestParam("friendId") String friendId,@RequestParam("userId") String userId) {
+		LoggedInUser user = daoService.getUserById(userId);
+		if(user!=null && user.getFriendRequests()!=null && user.getFriendRequests().contains(friendId)) {
+			user.getFriendRequests().remove(friendId);
+			user.addFriend(friendId);
+			daoService.saveUser(user);
+		}
+		return user.getFriends();
+	}
 }

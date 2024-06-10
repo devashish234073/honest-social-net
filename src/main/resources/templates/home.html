@@ -620,14 +620,14 @@
             });
         }
         function acceptFriendRequest(friendId) {
-            callGetApi("/acceptFriendReq?friendId=" + friendId + "___" + user.id, (resp) => {
+            callGetApi("/acceptFriendReq?friendId=" + friendId + "&userId=" + user.id, (resp) => {
                 let obj = JSON.parse(resp);
                 populateFriendRequests(obj.friendRequests);
                 populateFriendsTable(obj.friends);
             });
         }
         function rejectFriendRequest(friendId) {
-            callGetApi("/rejectFriendReq?friendId=" + friendId + "___" + user.id, (resp) => {
+            callGetApi("/rejectFriendReq?friendId=" + friendId + "&userId=" + user.id, (resp) => {
                 populateFriendRequests(JSON.parse(resp));
             });
         }
