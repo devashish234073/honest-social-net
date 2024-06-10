@@ -70,6 +70,12 @@ public class LoggedInUser {
 	public void setNotifications(List<String> notifications) {
 		this.notifications = notifications;
 	}
+	public void addNotification(String notification) {
+		if(this.notifications==null) {
+			this.notifications = new ArrayList<String>();
+		}
+		this.notifications.add(notification);
+	}
 	public List<String> getPosts() {
 		return posts;
 	}
