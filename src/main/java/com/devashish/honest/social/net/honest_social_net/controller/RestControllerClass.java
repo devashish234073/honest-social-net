@@ -56,6 +56,8 @@ public class RestControllerClass {
 		if(user.getFriendRequests()!=null && user.getFriendRequests().contains(friendId)) {
 			return "You have already have a frnd req from "+friendId;
 		}
-		return null;
+		friend.addFriend(userId);
+		friend.addNotification("You have one friend request from @"+userId);
+		return friendId+" Found. Send Friend Request";
 	}
 }
