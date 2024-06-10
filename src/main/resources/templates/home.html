@@ -615,7 +615,7 @@
                 return;
             }
             let friendId = $("#friendId").value;
-            callGetApi("/sendFriendReq?friendId=" + friendId + "___" + user.id, (resp) => {
+            callGetApi("/sendFriendReq?friendId=" + friendId + "&userId=" + user.id, (resp) => {
                 $("#friendReqBtn").value = resp;
             });
         }

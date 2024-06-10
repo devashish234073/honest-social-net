@@ -39,6 +39,15 @@ public class RestControllerClass {
 	
 	@GetMapping("searchFriend")
 	public String searchFriend(@RequestParam("friendId") String friendId,@RequestParam("userId") String userId) {
+		String validationResult = performBasicValidation(friendId,userId);
+		if(validationResult!=null) {
+			return validationResult;
+		}
+		LoggedInUser friend = daoService.getUserById(friendId);
+		return friendId+" Found. Send Friend Request";
+	}
+	
+	private String performBasicValidation(String friendId, String userId) {
 		if(friendId.equals(userId)) {
 			return "You can't send friend request to yourself";
 		}
@@ -56,8 +65,19 @@ public class RestControllerClass {
 		if(user.getFriendRequests()!=null && user.getFriendRequests().contains(friendId)) {
 			return "You have already have a frnd req from "+friendId;
 		}
-		friend.addFriend(userId);
+		return null;
+	}
+
+	@GetMapping("sendFriendReq")
+	public String sendFriendReq(@RequestParam("friendId") String friendId,@RequestParam("userId") String userId) {
+		String validationResult = performBasicValidation(friendId,userId);
+		if(validationResult!=null) {
+			return validationResult;
+		}
+		LoggedInUser friend = daoService.getUserById(friendId);
+		friend.addFriendRequest(friendId);
 		friend.addNotification("You have one friend request from @"+userId);
-		return friendId+" Found. Send Friend Request";
+		daoService.saveUser(friend);
+		return "Frend Request sent to " + friendId;
 	}
 }

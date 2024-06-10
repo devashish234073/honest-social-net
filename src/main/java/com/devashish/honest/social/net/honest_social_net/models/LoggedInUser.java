@@ -46,6 +46,12 @@ public class LoggedInUser {
 	public void setFriendRequests(List<String> friendRequests) {
 		this.friendRequests = friendRequests;
 	}
+	public void addFriendRequest(String friendId) {
+		if(this.friendRequests==null) {
+			this.friendRequests = new ArrayList<String>();
+		}
+		this.friendRequests.add(friendId);
+	}
 	public List<String> getFriends() {
 		return friends;
 	}
