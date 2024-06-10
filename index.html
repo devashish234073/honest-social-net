@@ -229,6 +229,10 @@
             <td><input type="text" placeholder="search friend" id="friendId"><input type="button"
                     onclick="searchFriend()" value="Search Friend"></td>
         </tr>
+        <tr>
+            <td id="friendReqBtnTd"><input type="button" value="" id="friendReqBtn"
+                    onclick="sendFriendRequest()"></td>
+        </tr>
     </table>
     <div class="topTableContainer">
         <table class="topTable">
@@ -258,10 +262,6 @@
         <tr>
             <td>
                 <table>
-                    <tr>
-                        <td id="friendReqBtnTd"><input type="button" value="" id="friendReqBtn"
-                                onclick="sendFriendRequest()"></td>
-                    </tr>
                     <tr>
                         <td><textarea cols="60" rows="3" placeholder="Say something to the world"
                                 id="caption"></textarea></td>
