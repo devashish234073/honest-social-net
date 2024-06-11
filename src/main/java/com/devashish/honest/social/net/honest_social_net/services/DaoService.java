@@ -48,6 +48,11 @@ public class DaoService {
     	Optional<LoggedInUser> user = userRepository.findById(id);
         return user.isEmpty()?null:user.get();
     }
+    
+    public Post getPostById(String id) {
+    	Optional<Post> post = postRepository.findById(id);
+    	return post.isEmpty()?null:post.get();
+    }
 
     public List<Comment> getAllComments() {
         return commentRepository.findAll();

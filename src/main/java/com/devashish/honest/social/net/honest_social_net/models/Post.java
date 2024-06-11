@@ -12,7 +12,8 @@ public class Post {
 	@Id
     @GeneratedValue(strategy = GenerationType.UUID)
 	private String id;
-	private String image;
+	@Lob
+	private byte[] image;
 	private String caption;
 	public static enum VISIBILITY{EVERYONE,ONLYFRIENDS,PRIVATE};
 	@Enumerated(EnumType.ORDINAL)
@@ -71,10 +72,10 @@ public class Post {
 	public void setId(String id) {
 		this.id = id;
 	}
-	public String getImage() {
+	public byte[] getImage() {
 		return image;
 	}
-	public void setImage(String image) {
+	public void setImage(byte[] image) {
 		this.image = image;
 	}
 	public String getCaption() {
