@@ -478,7 +478,7 @@
         }
         function getStatusUpdate(postId, userId, friendId) {
             var xhttp = new XMLHttpRequest();
-            xhttp.open("GET", "/getPost?postDetails=" + userId + "___" + friendId + "___" + postId, true);
+            xhttp.open("GET", "/getPost?userId=" + userId + "&friendId=" + friendId + "&postId=" + postId, true);
             xhttp.responseType = 'blob';
             xhttp.onload = function () {
                 if (xhttp.status === 200) {
