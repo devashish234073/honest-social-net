@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,6 +20,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Controller
 public class ControllerClass {
 	
+	Logger logger = LoggerFactory.getLogger(ControllerClass.class);
+	
 	@Autowired
 	private DaoService daoService;
 	
@@ -30,6 +34,13 @@ public class ControllerClass {
 	@GetMapping("/login")
 	public String login(@RequestParam("id") String id,Model model) {
 		var user = daoService.getUserById(id);
+		if(user==null) {
+			user = new LoggedInUser(id);
+			daoService.saveUser(user);
+			logger.info("new user "+id+" signed up");
+		} else {
+			logger.info("existing user "+id+" logged in");
+		}
 		populateUserData(user);
 		ObjectMapper objectMapper = new ObjectMapper();
         String userJson;
