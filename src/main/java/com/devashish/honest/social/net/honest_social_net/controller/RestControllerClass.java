@@ -99,6 +99,10 @@ public class RestControllerClass {
 			user.getFriendRequests().remove(friendId);
 			user.addFriend(friendId);
 			daoService.saveUser(user);
+			LoggedInUser friend = daoService.getUserById(friendId);
+			friend.addFriend(userId);
+			friend.addNotification(userId+" accepted your friend request");
+			daoService.saveUser(friend);
 		}
 		FriendsAndFriendRequests friendsAndFriendRequests = new FriendsAndFriendRequests();
 		friendsAndFriendRequests.setFriendRequests(user.getFriendRequests()==null?new ArrayList<String>():user.getFriendRequests());
