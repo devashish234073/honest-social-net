@@ -21,9 +21,9 @@ public class LoggedInUser {
 	@Column(name = "posts")
 	@CollectionTable(name = "user_posts", joinColumns = @JoinColumn(name = "logged_in_user_id"))
     private List<String> posts;
-	@Column(name = "friends_posts")
-	@CollectionTable(name = "logged_in_user_friends_posts", joinColumns = @JoinColumn(name = "logged_in_user_id"))
-    private List<String> friendsPosts;
+	//Not saved to db
+	@Transient
+    private List<FriendsPost> friendsPosts;
 	@ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(name = "logged_in_user_notifications", joinColumns = @JoinColumn(name = "logged_in_user_id"))
 	@Column(name = "notification")
@@ -64,10 +64,10 @@ public class LoggedInUser {
 		}
 		this.friends.add(friendsId);
 	}
-	public List<String> getFriendsPosts() {
+	public List<FriendsPost> getFriendsPosts() {
 		return friendsPosts;
 	}
-	public void setFriendsPosts(List<String> friendsPosts) {
+	public void setFriendsPosts(List<FriendsPost> friendsPosts) {
 		this.friendsPosts = friendsPosts;
 	}
 	public List<String> getNotifications() {

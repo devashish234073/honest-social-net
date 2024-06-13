@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.devashish.honest.social.net.honest_social_net.models.FriendsPost;
 import com.devashish.honest.social.net.honest_social_net.models.LoggedInUser;
 import com.devashish.honest.social.net.honest_social_net.services.DaoService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -61,7 +62,7 @@ public class ControllerClass {
 			user.setFriends(new ArrayList<String>());
 		}
 		if(user.getFriendsPosts()==null) {
-			user.setFriendsPosts(new ArrayList<String>());
+			user.setFriendsPosts(new ArrayList<FriendsPost>());
 		}
 		if(user.getNotifications()==null) {
 			user.setNotifications(new ArrayList<String>());
@@ -72,9 +73,17 @@ public class ControllerClass {
 			if(friend==null) {
 				continue;
 			}
-			List<String> friendsPosts = friend.getPosts();
-			if(friendsPosts!=null) {
-				user.getFriendsPosts().addAll(friendsPosts);	
+			List<String> friendsPostIds = friend.getPosts();
+			if(friendsPostIds!=null) {
+				List<FriendsPost> friendsPosts = new ArrayList<FriendsPost>();
+				for(int j=0;j<friendsPostIds.size();j++) {
+					String postId = friendsPostIds.get(j);
+					FriendsPost friendsPost = new FriendsPost();
+					friendsPost.setFriendId(friendId);
+					friendsPost.setPostId(postId);
+					friendsPosts.add(friendsPost);
+				}
+				user.getFriendsPosts().addAll(friendsPosts);
 			}
 		}
 	}
