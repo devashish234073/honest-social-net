@@ -4,6 +4,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -40,10 +44,12 @@ public class ImageController {
 		return "success";
 	}
 	
-	@GetMapping("/getPost")
-	public byte[] getPost(@RequestParam("userId") String userId,@RequestParam("friendId") String friendId,@RequestParam("postId") String postId) {
+	@GetMapping(value="/getPost")
+	public ResponseEntity<byte[]> getPost(@RequestParam("userId") String userId,@RequestParam("friendId") String friendId,@RequestParam("postId") String postId) {
 		Post post = daoService.getPostById(postId);
-		return post.getImage();
+		HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_PNG);
+		return new ResponseEntity<>(post.getImage(),headers,HttpStatus.OK);
 	}
     		
 }
