@@ -595,6 +595,9 @@
                 }
             }
         }
+        function $_(selector) {
+        	return document.querySelectorAll(selector);
+        }
         function startImageWidthScanner() {
         	let iterationCount = 0;
         	let timerId = setInterval(function(){
@@ -621,7 +624,7 @@
             	} else {
             		console.log("no imges to scan",imgs);
             	}
-        	},1200);
+        	},600);
         }
         startImageWidthScanner();
         $("#friendReqBtn").style.display = "none";
