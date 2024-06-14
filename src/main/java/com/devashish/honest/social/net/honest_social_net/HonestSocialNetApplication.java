@@ -1,5 +1,7 @@
 package com.devashish.honest.social.net.honest_social_net;
 
+import java.util.ArrayList;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -20,6 +22,12 @@ public class HonestSocialNetApplication {
 		LoggedInUser user2 = new LoggedInUser("user2");
 		LoggedInUser user3 = new LoggedInUser("user3");
 		Post post = new Post("What is this");
+		if(post.getLikes()==null) {
+			post.setLikes(new ArrayList<String>());
+		}
+		if(post.getComments()==null) {
+			post.setComments(new ArrayList<Comment>());
+		}
 		Comment comment = new Comment("Hello check");
 		post.addComment(comment);
 		daoService.saveUser(user1);

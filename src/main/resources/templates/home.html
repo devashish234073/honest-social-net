@@ -391,6 +391,7 @@
             xhr.onload = function () {
                 if (xhr.status === 200) {
                     alert('Status update success');
+                    window.location.reload();
                 } else {
                     alert('Status update failed. Error code ' + xhr.status);
                 }
@@ -443,6 +444,9 @@
             xhttp.send();
         }
         function updateLikeBtn(likes, likeBtn) {
+        	if(!likes) {
+        		likes = [];
+        	}
             likeBtn.innerText = "Like (" + likes.length + ")";
             if (likes.length == 0) {
                 likeBtn.setAttribute("title", "");
@@ -595,6 +599,38 @@
                 }
             }
         }
+        function $_(selector) {
+        	return document.querySelectorAll(selector);
+        }
+        function startImageWidthScanner() {
+        	let iterationCount = 0;
+        	let timerId = setInterval(function(){
+        		let imgs = $_("img");
+            	if(imgs && imgs.length>0) {
+            		iterationCount++;
+            		for(let imgIndx in imgs) {
+            			let img = imgs[imgIndx];
+            			console.log("image dims:",img.width+" "+img.height);
+            			if(img.width>640 || img.height>480) {
+            				let tmr = setInterval(()=>{
+                				if(img.width>640 || img.height>480) {
+                    				img.width = 0.9*img.width;
+                    				img.height = 0.9*img.height;
+                    			} else {
+                    				clearInterval(tmr);
+                    			}
+                			},50);	
+            			}
+            		}
+            		if(iterationCount>2) {
+            			clearInterval(timerId);
+            		}
+            	} else {
+            		console.log("no imges to scan",imgs);
+            	}
+        	},1200);
+        }
+        startImageWidthScanner();
         $("#friendReqBtn").style.display = "none";
         function searchFriend() {
             let friendId = $("#friendId").value;

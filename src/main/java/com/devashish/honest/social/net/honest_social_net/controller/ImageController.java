@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.devashish.honest.social.net.honest_social_net.models.Comment;
 import com.devashish.honest.social.net.honest_social_net.models.LoggedInUser;
 import com.devashish.honest.social.net.honest_social_net.models.Post;
 import com.devashish.honest.social.net.honest_social_net.models.Post.VISIBILITY;
@@ -53,6 +54,13 @@ public class ImageController {
 		Post post = daoService.getPostById(postId);
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.IMAGE_JPEG);
+		headers.add("caption", post.getCaption());
+		if(post.getLikes()==null) {
+			post.setLikes(new ArrayList<String>());
+		}
+		if(post.getComments()==null) {
+			post.setComments(new ArrayList<Comment>());
+		}
 		return new ResponseEntity<>(post.getImage(), headers, HttpStatus.OK);
 	}
 
