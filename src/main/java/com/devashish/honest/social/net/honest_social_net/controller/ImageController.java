@@ -47,6 +47,20 @@ public class ImageController {
 		daoService.saveUser(user);
 		return "success";
 	}
+	
+	@PostMapping("/postStatusNoImage")
+	public String postStatus(@RequestPart("caption") String caption,
+			@RequestPart("userId") String userId) {
+		LoggedInUser user = daoService.getUserById(userId);
+		Post post = new Post();
+		post.setCaption(caption);
+		post.setUserId(userId);
+		post.setVisibility(VISIBILITY.EVERYONE);
+		daoService.savePost(post);
+		user.addPost(post);
+		daoService.saveUser(user);
+		return "success";
+	}
 
 	@GetMapping(value = "/getPost")
 	public ResponseEntity<byte[]> getPost(@RequestParam("userId") String userId,

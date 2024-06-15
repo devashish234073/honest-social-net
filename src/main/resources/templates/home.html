@@ -381,13 +381,15 @@
                 return;
             }
             const formData = new FormData();
+            let apiUrl = "/postStatusNoImage";
             if (imageFile) {
                 formData.append('image', imageFile);
+                apiUrl = "/postStatus";
             }
             formData.append('caption', caption);
             formData.append('userId', user.id);
             const xhr = new XMLHttpRequest();
-            xhr.open('POST', '/postStatus', true);
+            xhr.open('POST', apiUrl, true);
             xhr.onload = function () {
                 if (xhr.status === 200) {
                     alert('Status update success');
@@ -512,12 +514,10 @@
                     tr00.appendChild(td00);
                     childTable.appendChild(tr0);
                     childTable.appendChild(tr00);
-                    if (contentType == "text/plain") {
-                        blob.text().then((data) => {
-                            td00.innerText = data;
-                        });
+                    const caption = xhttp.getResponseHeader("caption");
+                    if (blob.size==0) {
+                    	td00.innerText = caption;
                     } else {
-                        const caption = xhttp.getResponseHeader("caption");
                         td00.innerText = caption;
                         let tr = document.createElement("tr");
                         let td = document.createElement("td");
