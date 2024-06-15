@@ -76,6 +76,10 @@ public class LikeAndCommentController {
 		comment.setUserId(userId);
 		comment.setDate(new Date());
 		post.addComment(comment);
+		if(!userId.equals(postAuthorId)) {
+			String notification = userId+" commented '"+commentStr+"' on your post "+postId;
+			postAuthor.addNotification(notification);
+		}
 		daoService.savePost(post);
 		daoService.saveUser(postAuthor);
 		return post.getComments();
