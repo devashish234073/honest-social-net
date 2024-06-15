@@ -584,7 +584,7 @@
                     let commenttd1 = document.createElement("td");
                     commenttd1.setAttribute("class", "commentTxt");
                     commenttd1.setAttribute("colspan", "2");
-                    commenttd0.innerText = "["+new Date(comments[cmntIndx].date)+"] "+comments[cmntIndx].user;
+                    commenttd0.innerText = "["+new Date(comments[cmntIndx].date)+"] "+comments[cmntIndx].userId;
                     commenttd1.innerText = comments[cmntIndx].comment;
                     commentRow0.appendChild(commenttd0);
                     commentRow1.appendChild(commenttd1);
@@ -629,6 +629,7 @@
             			clearInterval(timerId);
             		}
             	} else {
+            		noImagesIterationCount++;
             		console.log("no images to scan",imgs);
             		if(noImagesIterationCount>10) {
             			clearInterval(timerId);
