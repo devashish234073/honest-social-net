@@ -25,6 +25,9 @@ public class LikeAndCommentController {
 			return new ArrayList<String>();
 		}
 		String postAuthorId = post.getUserId();
+		if(postAuthorId==null) {
+			return new ArrayList<String>();
+		}
 		LoggedInUser postAuthor = daoService.getUserById(postAuthorId);
 		if(postAuthor==null) {
 			return new ArrayList<String>();
@@ -34,10 +37,14 @@ public class LikeAndCommentController {
 		}
 		if(post.getLikes().indexOf(userId)>-1) {
 			post.getLikes().remove(userId);//unlike
-			postAuthor.addNotification("post " + postId + " un-liked by " + userId); 
+			if(!userId.equals(postAuthorId)) {
+				postAuthor.addNotification("post " + postId + " un-liked by " + userId); 	
+			}
 		} else {
 			post.getLikes().add(userId);//like
-			postAuthor.addNotification("post " + postId + " liked by " + userId);
+			if(!userId.equals(postAuthorId)) {
+			    postAuthor.addNotification("post " + postId + " liked by " + userId);
+			}
 		}
 		daoService.savePost(post);
 		daoService.saveUser(postAuthor);

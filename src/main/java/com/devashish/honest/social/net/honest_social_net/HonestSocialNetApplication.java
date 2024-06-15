@@ -31,6 +31,7 @@ public class HonestSocialNetApplication {
 		Comment comment = new Comment("Hello check");
 		post.addComment(comment);
 		daoService.saveUser(user1);
+		post.setUserId(user1.getId());
 		daoService.savePost(post);
 		System.out.println(daoService.getAllUsers());
 		user1.addPost(post);

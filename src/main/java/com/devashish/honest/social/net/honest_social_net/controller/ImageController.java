@@ -20,6 +20,8 @@ import com.devashish.honest.social.net.honest_social_net.models.LoggedInUser;
 import com.devashish.honest.social.net.honest_social_net.models.Post;
 import com.devashish.honest.social.net.honest_social_net.models.Post.VISIBILITY;
 import com.devashish.honest.social.net.honest_social_net.services.DaoService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 public class ImageController {
@@ -68,6 +70,11 @@ public class ImageController {
 		Post post = daoService.getPostById(postId);
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.IMAGE_JPEG);
+		populateCaptionLikesAndComments(headers,post);
+		return new ResponseEntity<>(post.getImage(), headers, HttpStatus.OK);
+	}
+	
+	private void populateCaptionLikesAndComments(HttpHeaders headers,Post post) {
 		headers.add("caption", post.getCaption());
 		if(post.getLikes()==null) {
 			post.setLikes(new ArrayList<String>());
@@ -75,7 +82,14 @@ public class ImageController {
 		if(post.getComments()==null) {
 			post.setComments(new ArrayList<Comment>());
 		}
-		return new ResponseEntity<>(post.getImage(), headers, HttpStatus.OK);
+		ObjectMapper objectMapper = new ObjectMapper();
+        String likesString;
+		try {
+			likesString = objectMapper.writeValueAsString(post.getLikes());
+			headers.add("likes", likesString);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
