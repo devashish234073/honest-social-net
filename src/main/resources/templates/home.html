@@ -463,7 +463,7 @@
         }
         function likePost(postId, likeBtn) {
             return function () {
-                callGetApi("/likePost?postDetails=" + postId + "___" + user.id, (resp) => {
+                callGetApi("/likePost?postId=" + postId + "&userId=" + user.id, (resp) => {
                     let likes = JSON.parse(resp);
                     updateLikeBtn(likes, likeBtn);
                 });
