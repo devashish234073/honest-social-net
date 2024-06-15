@@ -604,6 +604,7 @@
         }
         function startImageWidthScanner() {
         	let iterationCount = 0;
+        	let noImagesIterationCount = 0;
         	let timersRunning = [];
         	let timerId = setInterval(function(){
         		let imgs = $_("img");
@@ -628,7 +629,10 @@
             			clearInterval(timerId);
             		}
             	} else {
-            		console.log("no imges to scan",imgs);
+            		console.log("no images to scan",imgs);
+            		if(noImagesIterationCount>10) {
+            			clearInterval(timerId);
+            		}
             	}
         	},600);
         }
