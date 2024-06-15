@@ -90,6 +90,13 @@ public class ImageController {
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}
+		String commentsString;
+		try {
+			commentsString = objectMapper.writeValueAsString(post.getComments());
+			headers.add("comments", commentsString);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

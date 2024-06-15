@@ -1,6 +1,7 @@
 package com.devashish.honest.social.net.honest_social_net.controller;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.devashish.honest.social.net.honest_social_net.models.Comment;
 import com.devashish.honest.social.net.honest_social_net.models.LoggedInUser;
 import com.devashish.honest.social.net.honest_social_net.models.Post;
 import com.devashish.honest.social.net.honest_social_net.services.DaoService;
@@ -49,5 +51,33 @@ public class LikeAndCommentController {
 		daoService.savePost(post);
 		daoService.saveUser(postAuthor);
 		return post.getLikes();
+	}
+	
+	@GetMapping("commentOnPost")
+	public List<Comment> commentOnPost(@RequestParam("postId") String postId,@RequestParam("userId") String userId,@RequestParam("comment") String commentStr) {
+		Post post = daoService.getPostById(postId);
+		var emptyCommentList = new ArrayList<Comment>();
+		if(post==null) {
+			return emptyCommentList;
+		}
+		String postAuthorId = post.getUserId();
+		if(postAuthorId==null) {
+			return emptyCommentList;
+		}
+		LoggedInUser postAuthor = daoService.getUserById(postAuthorId);
+		if(postAuthor==null) {
+			return emptyCommentList;
+		}
+		if(post.getComments()==null) {
+			post.setComments(emptyCommentList);
+		}
+		Comment comment = new Comment();
+		comment.setComment(commentStr);
+		comment.setUserId(userId);
+		comment.setDate(new Date());
+		post.addComment(comment);
+		daoService.savePost(post);
+		daoService.saveUser(postAuthor);
+		return post.getComments();
 	}
 }

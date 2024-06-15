@@ -475,7 +475,7 @@
                     alert("Can't add empty comment");
                     return;
                 }
-                callGetApi("/commentOnPost?postDetails=" + postId + "___" + user.id + "___" + commentBox.value, (resp) => {
+                callGetApi("/commentOnPost?postId=" + postId + "&userId=" + user.id + "&comment=" + commentBox.value, (resp) => {
                     console.log("comment response", resp);
                     populateComments(postId, JSON.parse(resp));
                     commentBox.value = "";
