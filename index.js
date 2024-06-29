@@ -1,5 +1,16 @@
 let http = require("http");
 let fs = require("fs");
+let generateImageFunc = null;
+(async () => {
+    try {
+        const { generateImage } = await import('./AI/stability-ai.js');
+        console.log(generateImage);
+        generateImageFunc = generateImage;
+    } catch (error) {
+        console.error('Error importing AI/stability-ai:', error);
+    }
+})();
+
 const PORT = 9090;
 let userData = {};
 let userDataHash = null;
@@ -233,7 +244,7 @@ let server = http.createServer((req, res) => {
                         image = post.image;
                     }
                     let likes = JSON.stringify(post["likes"] ? post["likes"] : []);
-                    if (image != null) {
+                    if (image != null && image.indexOf("http")!=0) {
                         fs.readFile("uploads/" + image, (err, data) => {
                             if (err) {
                                 res.status(500).send('Error reading the image file');
@@ -243,7 +254,11 @@ let server = http.createServer((req, res) => {
                             }
                         });
                     } else {
-                        res.writeHead(200, { 'Content-Type': 'text/plain', 'date': post.date, 'likes': likes,'comments':JSON.stringify(post.comments) });
+                        if(image != null && image.indexOf("http")==0) {
+                            res.writeHead(200, { 'Content-Type': 'text/plain', 'imageUrl':image,'date': post.date, 'likes': likes,'comments':JSON.stringify(post.comments) });
+                        } else {
+                            res.writeHead(200, { 'Content-Type': 'text/plain', 'date': post.date, 'likes': likes,'comments':JSON.stringify(post.comments) });
+                        }
                         res.end(post.caption);
                     }
                 }
@@ -343,12 +358,14 @@ let server = http.createServer((req, res) => {
             let fileName = null;
             let caption = null;
             let userId = null;
+            let generateUsingAI = false;
             parts.forEach(part => {
                 const [headers, rawBody] = part.split('\r\n\r\n');
                 if (headers && rawBody) {
                     const dispositionMatch = headers.match(/Content-Disposition: form-data; name="([^"]+)"; filename="([^"]+)"/);
                     const dispositionMatch2 = headers.match(/Content-Disposition: form-data; name="caption"/);
                     const dispositionMatch3 = headers.match(/Content-Disposition: form-data; name="userId"/);
+                    const dispositionMatch4 = headers.match(/Content-Disposition: form-data; name="aigenerate"/);
                     if (dispositionMatch) {
                         fileName = dispositionMatch[2].split(".");
                         fileName = generateUUID() + "." + fileName[fileName.length - 1];
@@ -372,6 +389,11 @@ let server = http.createServer((req, res) => {
                         if (name.indexOf("name=\"userId\"") > -1) {
                             userId = rawBody.trim();
                         }
+                    } else if (dispositionMatch4) {
+                        const aigenerate = dispositionMatch4[0];
+                        if (aigenerate) {
+                            generateUsingAI = true;
+                        }
                     }
                 }
             });
@@ -380,6 +402,10 @@ let server = http.createServer((req, res) => {
             userData[userId]["posts"].push(postId);
             posts[postId] = post;
             console.log("status update", post);
+            if(generateUsingAI) {
+                console.log("content will get generetd using AI");
+                generatePostUsingAI(caption,userId,postId);
+            }
             res.writeHead(200, { 'Content-Type': 'text/plain' });
             res.end('success');
         });
@@ -388,6 +414,18 @@ let server = http.createServer((req, res) => {
         res.end('400 Bad Request');
     }
 });
+
+async function generatePostUsingAI(caption,userId,postId) {
+    generateImageFunc(caption).then((result)=>{
+        console.log("image properly generated using AI",result);
+        if(result && typeof result == 'object' && result.length>0) {
+            posts[postId]["image"] = result[0];
+        } 
+    })
+    .catch((error)=>{
+        console.log("error generating AI image",error);
+    });
+}
 
 function generateUUID2() {
     return 'xxxxxxxx-x3xx-4xxx-yxxx'.replace(/[xy]/g, function (c) {

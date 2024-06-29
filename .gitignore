@@ -4,3 +4,4 @@ uploads/*
 !uploads/placeholder.txt
 data/*
 !data/placeholder.txt
+AI/node_modules

@@ -214,6 +214,10 @@
         .topMostTable {
             margin-bottom: 20px;
         }
+
+        #postTable {
+            width: 270px;
+        }
     </style>
 </head>
 
@@ -230,8 +234,7 @@
                     onclick="searchFriend()" value="Search Friend"></td>
         </tr>
         <tr>
-            <td id="friendReqBtnTd"><input type="button" value="" id="friendReqBtn"
-                    onclick="sendFriendRequest()"></td>
+            <td id="friendReqBtnTd"><input type="button" value="" id="friendReqBtn" onclick="sendFriendRequest()"></td>
         </tr>
     </table>
     <div class="topTableContainer">
@@ -268,8 +271,15 @@
                     </tr>
                     <tr>
                         <td>
-                            <input type="file" id="image" name="image" accept="image/*"><input type="button"
-                                value="POST" onclick="postStatus()">
+                            <table id="postTable">
+                                <tr>
+                                    <td><input type="checkbox" id="generateUsingAI"></td>
+                                    <td>Generate using AI</td>
+                                    <td><input type="file" id="image" name="image" accept="image/*"></td>
+                                    <td><input type="button" value="POST" onclick="postStatus()"></td>
+                                </tr>
+                            </table>
+
                         </td>
                     </tr>
                     <tr>
@@ -291,6 +301,14 @@
         }
         $("#signOut").addEventListener("click", () => {
             window.location.href = "/";
+        });
+        $("#generateUsingAI").addEventListener("click", () => {
+            if ($("#generateUsingAI").checked) {
+                $("#image").style.display = "none";
+                $("#image").value = "";
+            } else {
+                $("#image").style.display = "block";
+            }
         });
         let user = JSON.parse(`__PLACEHOLDER__`);
         populateNotification(user.notifications);
@@ -345,10 +363,10 @@
 
         function addListenerToScrollToPost(td, postId) {
             td.setAttribute("class", "hoverlink");
-            setTimeout(()=>{
+            setTimeout(() => {
                 const postElement = document.querySelector("#" + postId);
                 td.setAttribute("title", postElement.innerText);
-            },1000);
+            }, 1000);
             td.addEventListener("click", () => {
                 const postElement = document.querySelector("#" + postId);
                 postElement.scrollIntoView({ behavior: 'smooth', inline: 'start' });
@@ -385,6 +403,9 @@
             }
             formData.append('caption', caption);
             formData.append('userId', user.id);
+            if ($("#generateUsingAI").checked) {
+                formData.append('aigenerate', "true");
+            }
             const xhr = new XMLHttpRequest();
             xhr.open('POST', '/postStatus', true);
             xhr.onload = function () {
@@ -511,6 +532,17 @@
                     if (contentType == "text/plain") {
                         blob.text().then((data) => {
                             td00.innerText = data;
+                            const imageUrl = xhttp.getResponseHeader("imageUrl");
+                            if (imageUrl) {
+                                let tr = document.createElement("tr");
+                                let td = document.createElement("td");
+                                td.setAttribute("colspan", "2");
+                                tr.appendChild(td);
+                                let img = document.createElement("img");
+                                td.appendChild(img);
+                                img.src = imageUrl;
+                                childTable.appendChild(tr);
+                            }
                         });
                     } else {
                         const caption = xhttp.getResponseHeader("caption");
@@ -580,7 +612,7 @@
                     let commenttd1 = document.createElement("td");
                     commenttd1.setAttribute("class", "commentTxt");
                     commenttd1.setAttribute("colspan", "2");
-                    commenttd0.innerText = "["+new Date(comments[cmntIndx].date)+"] "+comments[cmntIndx].user;
+                    commenttd0.innerText = "[" + new Date(comments[cmntIndx].date) + "] " + comments[cmntIndx].user;
                     commenttd1.innerText = comments[cmntIndx].comment;
                     commentRow0.appendChild(commenttd0);
                     commentRow1.appendChild(commenttd1);
@@ -596,42 +628,42 @@
             }
         }
         function $_(selector) {
-        	return document.querySelectorAll(selector);
+            return document.querySelectorAll(selector);
         }
         function startImageWidthScanner() {
-        	let iterationCount = 0;
+            let iterationCount = 0;
             let noImagesIterationCount = 0;
-        	let timersRunning = [];
-        	let timerId = setInterval(function(){
-        		let imgs = $_("img");
-            	if(imgs && imgs.length>0) {
-            		iterationCount++;
-            		for(let imgIndx in imgs) {
-            			let img = imgs[imgIndx];
-            			console.log("image dims:",img.width+" "+img.height);
-            			if(timersRunning.indexOf(imgIndx)==-1 && img.width>640 || img.height>480) {
-            				let tmr = setInterval(()=>{
-            					timersRunning.push(imgIndx);
-                				if(img.width>640 || img.height>480) {
-                    				img.width = 0.97*img.width;
-                    				img.height = 0.97*img.height;
-                    			} else {
-                    				clearInterval(tmr);
-                    			}
-                			},50);	
-            			}
-            		}
-            		if(iterationCount>2) {
-            			clearInterval(timerId);
-            		}
-            	} else {
-            		noImagesIterationCount++;
-            		console.log("no images to scan",imgs);
-            		if(noImagesIterationCount>10) {
-            			clearInterval(timerId);
-            		}
-            	}
-        	},600);
+            let timersRunning = [];
+            let timerId = setInterval(function () {
+                let imgs = $_("img");
+                if (imgs && imgs.length > 0) {
+                    iterationCount++;
+                    for (let imgIndx in imgs) {
+                        let img = imgs[imgIndx];
+                        console.log("image dims:", img.width + " " + img.height);
+                        if (timersRunning.indexOf(imgIndx) == -1 && img.width > 640 || img.height > 480) {
+                            let tmr = setInterval(() => {
+                                timersRunning.push(imgIndx);
+                                if (img.width > 640 || img.height > 480) {
+                                    img.width = 0.97 * img.width;
+                                    img.height = 0.97 * img.height;
+                                } else {
+                                    clearInterval(tmr);
+                                }
+                            }, 50);
+                        }
+                    }
+                    if (iterationCount > 2) {
+                        clearInterval(timerId);
+                    }
+                } else {
+                    noImagesIterationCount++;
+                    console.log("no images to scan", imgs);
+                    if (noImagesIterationCount > 10) {
+                        clearInterval(timerId);
+                    }
+                }
+            }, 600);
         }
         startImageWidthScanner();
         $("#friendReqBtn").style.display = "none";
