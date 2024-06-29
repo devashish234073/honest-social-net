@@ -1,6 +1,7 @@
 let http = require("http");
 let fs = require("fs");
 let generateImageFunc = null;
+let generateImageFuncError = null;
 (async () => {
     try {
         const { generateImage } = await import('./AI/stability-ai.js');
@@ -8,6 +9,7 @@ let generateImageFunc = null;
         generateImageFunc = generateImage;
     } catch (error) {
         console.error('Error importing AI/stability-ai:', error);
+        generateImageFuncError = error;
     }
 })();
 
@@ -402,9 +404,12 @@ let server = http.createServer((req, res) => {
             userData[userId]["posts"].push(postId);
             posts[postId] = post;
             console.log("status update", post);
-            if(generateUsingAI) {
+            if(generateUsingAI && generateImageFunc) {
                 console.log("content will get generetd using AI");
                 generatePostUsingAI(caption,userId,postId);
+            }
+            if(generateUsingAI && !generateImageFunc) {
+                console.log("ai image generation not enabled",generateImageFuncError);
             }
             res.writeHead(200, { 'Content-Type': 'text/plain' });
             res.end('success');
