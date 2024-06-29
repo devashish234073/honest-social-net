@@ -2,6 +2,14 @@
 
 This is the nodejs version of the application for the java version please refer to the branch --> https://github.com/devashish234073/honest-social-net/tree/java-hibernate
 
+To start the application run "node index.js" but if you want to use AI image generation feature also then first cd to AI directory do a npm install there then comeback to root directory then do "node index.js"
+
+Node: AI image generation feature is only available in nodejs version of the app.
+
+Also note to make AI image generation work before running "node index.js" you need to run "export REPLICATE_API_TOKEN=<your-token-here>" with your own REPLICATE_API_TOKEN which you get when you sign up to replicate.com
+
+## About the app's other basic features
+
 This is a social media world without password where fellow humans trust each others and each are honest to login with their own userid.
 
 User id you should choose such a unique that no one in other part of world should be able to think otherwise you can login to theirs.
