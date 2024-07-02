@@ -40,3 +40,11 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Ignore all files in the uploads directory
+backend/uploads/*
+# But do not ignore placeholder.txt
+!backend/uploads/placeholder.txt
+backend/data/*
+!backend/data/placeholder.txt
+backend/AI/node_modules

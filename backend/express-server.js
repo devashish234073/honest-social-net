@@ -4,6 +4,42 @@ const cors = require('cors');
 const app = express();
 const port = 3000;
 const cookies = [];
+let userData = {};
+let userDataHash = null;
+let posts = {};
+let postsHash = null;
+const EVERYONE = "everyone";
+const PRIVATE = "private";
+const ONLYFRIENDS = "onlyfriends";
+
+function populateData() {
+    try {
+        let stringifiedUSerData = fs.readFileSync("data/users.json");
+        userData = JSON.parse(stringifiedUSerData);
+        hashObject(stringifiedUSerData).then(hash => {
+            userDataHash = hash;
+        });
+        let stringifiedPostData = fs.readFileSync("data/posts.json");
+        posts = JSON.parse(stringifiedPostData);
+        hashObject(stringifiedPostData).then(hash => {
+            postsHash = hash;
+        });
+    } catch (e) {
+        console.error("Unable to populate data from local", e);
+    }
+    if (Object.keys(userData).length === 0) {
+        console.log("no data found locally. Populating default users");
+        userData["user123"] = { "id": "user123", "friendRequests": [], "friends": ["user124", "user125", "user126", "user127"], "posts": [], "friendsPosts": [], "notifications": [] };
+        userData["user124"] = { "id": "user124", "friendRequests": [], "friends": ["user123", "user125"], "posts": [], "friendsPosts": [], "notifications": [] };
+        userData["user125"] = { "id": "user125", "friendRequests": [], "friends": ["user123", "user124"], "posts": [], "friendsPosts": [], "notifications": [] };
+        userData["user126"] = { "id": "user126", "friendRequests": [], "friends": ["user123", "user127"], "posts": [], "friendsPosts": [], "notifications": [] };
+        userData["user127"] = { "id": "user127", "friendRequests": [], "friends": ["user123", "user126"], "posts": [], "friendsPosts": [], "notifications": [] };
+    } else {
+        console.log("data restored from local");
+    }
+}
+
+populateData();
 
 const corsOptions = {
     origin: 'http://localhost:4200',
