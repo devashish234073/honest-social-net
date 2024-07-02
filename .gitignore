@@ -48,3 +48,4 @@ backend/uploads/*
 backend/data/*
 !backend/data/placeholder.txt
 backend/AI/node_modules
+backend/node_modules
