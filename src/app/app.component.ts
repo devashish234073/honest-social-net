@@ -12,6 +12,7 @@ import { ApiCallService } from './api-call.service';
 })
 export class AppComponent {
   title = 'honest-social-net';
+  token:string | null = '';
   loggedIn = false;
   @ViewChild("userId") userId?: ElementRef;
 
@@ -24,12 +25,14 @@ export class AppComponent {
   constructor(private router: Router,private apiCallService: ApiCallService) { }
 
   ngOnInit(): void {
-    this.apiCallService.getData("http://localhost:3000/checkLogin",{}).subscribe((resp) => {
+    this.token = sessionStorage.getItem("token");
+    this.apiCallService.getData("http://localhost:3000/checkLogin",{"token":this.token}).subscribe((resp) => {
       console.log(resp.msg);
       if (resp.loggedIn) {
         console.log("marked logged in");
         sessionStorage.setItem("userId",resp.userId);
         this.loggedIn = true;
+        this.router.navigate(['/login']);
       } else {
         this.loggedIn = false;
         sessionStorage.removeItem("userId");
