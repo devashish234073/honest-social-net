@@ -223,6 +223,7 @@
       <h2 class="title gradient-background">{{ title }}</h2>
       <input *ngIf="!loggedIn" type="text" class="userid" placeholder="user id" #userId>
       <button *ngIf="!loggedIn" class="btn gradient-background" (click)="login()">Login</button>
+      <router-outlet></router-outlet>
     </div>
     <div class="divider" role="separator" aria-label="Divider"></div>
     <div class="right-side">
@@ -295,5 +296,3 @@
     </div>
   </div>
 </main>
-
-<router-outlet></router-outlet>

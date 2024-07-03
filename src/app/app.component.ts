@@ -2,6 +2,7 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, Router } from '@angular/router';
 import { ApiCallService } from './api-call.service';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-root',
@@ -26,19 +27,22 @@ export class AppComponent {
 
   ngOnInit(): void {
     this.token = sessionStorage.getItem("token");
-    this.apiCallService.getData("http://localhost:3000/checkLogin",{"token":this.token}).subscribe((resp) => {
-      console.log(resp.msg);
-      if (resp.loggedIn) {
-        console.log("marked logged in");
-        sessionStorage.setItem("userId",resp.userId);
-        this.loggedIn = true;
-        this.router.navigate(['/login']);
-      } else {
-        this.loggedIn = false;
-        sessionStorage.removeItem("userId");
-        this.router.navigate(['/']);
-      }
-    });
+    if(this.token) {
+      this.apiCallService.getData("http://localhost:3000/checkLogin",{"token":this.token}).subscribe((resp) => {
+        console.log("resp",resp);
+        console.log(resp.body.msg);
+        if (resp.body.loggedIn) {
+          console.log("marked logged in");
+          sessionStorage.setItem("userId",resp.body.userId);
+          this.loggedIn = true;
+          this.router.navigate(['/login']);
+        } else {
+          this.loggedIn = false;
+          sessionStorage.removeItem("userId");
+          this.router.navigate(['/']);
+        }
+      });
+    }
   }
 
   logout() {
@@ -57,13 +61,13 @@ export class AppComponent {
     } else if(user.indexOf(" ")>-1) {
       alert("user id can't contain space");
     } else {
-      this.apiCallService.getData("http://localhost:3000/login/" + user,{}).subscribe((resp) => {
-        console.log(resp.msg);
-        if (resp.loggedIn) {
+      this.apiCallService.getData("http://localhost:3000/login/" + user,{}).subscribe((resp: HttpResponse<any>) => {
+        console.log(resp);
+        if (resp.body.loggedIn) {
           console.log("marked logged in");
           this.loggedIn = true;
-          sessionStorage.setItem("userId",resp.userId);
-          sessionStorage.setItem("token",resp.token);
+          sessionStorage.setItem("userId",resp.body.userId);
+          sessionStorage.setItem("token",resp.body.token);
           this.router.navigate(['/login/']);
         }
       });

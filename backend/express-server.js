@@ -91,26 +91,55 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.get('/login/:userId', (req, res) => {
     const userId = req.params.userId;
     signUpIfNewUser(userId);
-    let token  = setToken(req, res, userId);
-    res.send(JSON.stringify({"msg":'logged in user '+userId,"userId":userId,"loggedIn":userId==undefined?false:true,"token":token}));
+    let token = setToken(req, res, userId);
+    res.send(JSON.stringify({ "msg": 'logged in user ' + userId, "userId": userId, "loggedIn": userId == undefined ? false : true, "token": token }));
 });
 
 app.get('/checkLogin', (req, res) => {
     let userId = setToken(req, res);
-    res.send(JSON.stringify({"msg":'logged in user '+userId,"userId":userId,"loggedIn":userId==undefined?false:true}));
+    res.send(JSON.stringify({ "msg": 'logged in user ' + userId, "userId": userId, "loggedIn": userId == undefined ? false : true }));
 });
 
 app.get('/getAllPosts', (req, res) => {
     let userId = setToken(req, res);
     let postId = req.query.postId;
-    let posts = userData[userId]["posts"];
-    res.send(JSON.stringify(posts));
+    if(!userData[userId]) {
+        res.send("[]");
+    } else {
+        let posts = userData[userId]["posts"];
+        res.send(JSON.stringify(posts));
+    }
 });
 
 app.get('/getPost', (req, res) => {
     let userId = setToken(req, res);
     let postId = req.query.postId;
-    res.send('Contact Page');
+    let post = posts[postId];
+    if (userData[userId] && post && userData[userId]["posts"].indexOf(postId) > -1) {
+        let image = post.image;
+        let likes = JSON.stringify(post["likes"] ? post["likes"] : []);
+        if (image != null && image.indexOf("http") != 0) {
+            fs.readFile("uploads/" + image, (err, data) => {
+                if (err) {
+                    res.status(500).send('Error reading the image file');
+                } else {
+                    res.writeHead(200, { 'Content-Type': 'application/json', 'caption': post.caption, 'date': post.date, 'likes': likes, 'comments': JSON.stringify(post.comments) });
+                    let imgData = {"imgData":data};
+                    res.end(JSON.stringify(imgData));
+                }
+            });
+        } else {
+            if (image != null && image.indexOf("http") == 0) {
+                res.writeHead(200, { 'Content-Type': 'application/json', 'imageUrl': image, 'date': post.date, 'likes': likes, 'comments': JSON.stringify(post.comments) });
+            } else {
+                res.writeHead(200, { 'Content-Type': 'application/json', 'date': post.date, 'likes': likes, 'comments': JSON.stringify(post.comments) });
+            }
+            let captionObj = {"caption":post.caption};
+            res.end(JSON.stringify(captionObj));
+        }
+    } else {
+        res.end('');
+    }
 });
 
 app.listen(port, () => {
@@ -120,13 +149,13 @@ app.listen(port, () => {
 //functions
 
 function signUpIfNewUser(userId) {
-    if(!userData[userId]) {
+    if (!userData[userId]) {
         userData[userId] = { "id": userId, "friendRequests": [], "friends": [], "posts": [], "friendsPosts": [], "notifications": [] };
     }
 }
 
 function setToken(req, res, userId) {
-    if(userId) {
+    if (userId) {
         let tok = generateUUID();
         tokens[tok] = userId;
         return tok;
