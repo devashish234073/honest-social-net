@@ -267,7 +267,7 @@
             />
           </svg>
         </a>
-        <button id="logoutBtn" (click)="logout()">Logout</button>
+        <button *ngIf="loggedIn" id="logoutBtn" (click)="logout()">Logout</button>
       </div>
       <div class="pill-group">
         @for (item of links; track item.title) {
