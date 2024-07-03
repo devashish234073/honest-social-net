@@ -8,5 +8,6 @@ Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The appli
 
 The login page is recreated inspired from default home page that angular creates in a new app:
 
-![image](https://github.com/devashish234073/honest-social-net/assets/20777854/05550754-aaac-4b19-89a8-2b1ce21640f7)
+![image](https://github.com/devashish234073/honest-social-net/assets/20777854/4e3b5479-47ff-44b7-be9b-94d129c10670)
+
 
