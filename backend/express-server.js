@@ -4,7 +4,7 @@ const cors = require('cors');
 const fs = require("fs");
 const app = express();
 const port = 3000;
-const cookies = [];
+const tokens = [];
 let userData = {};
 let userDataHash = null;
 let posts = {};
@@ -40,6 +40,42 @@ function populateData() {
     }
 }
 
+async function hashObject(jsonString) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(jsonString);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+    return hashHex;
+}
+
+function syncDataLocally() {
+    let stringifiedUSerData = JSON.stringify(userData);
+    hashObject(stringifiedUSerData).then(hash => {
+        if (userDataHash == null || userDataHash != hash) {
+            fs.writeFileSync("data/users.json", stringifiedUSerData);
+            console.log("users synched locally at " + (new Date()));
+            userDataHash = hash;
+        } else {
+            console.log("users sync cancelled. As no change is done");
+        }
+    });
+    let stringifiedPostData = JSON.stringify(posts);
+    hashObject(stringifiedPostData).then(hash => {
+        if (postsHash == null || postsHash != hash) {
+            fs.writeFileSync("data/posts.json", stringifiedPostData);
+            console.log("posts synched locally at " + (new Date()));
+            postsHash = hash;
+        } else {
+            console.log("posts sync cancelled. As no change is done");
+        }
+    });
+}
+
+setInterval(function () {
+    syncDataLocally();
+}, 60000);
+
 populateData();
 
 const corsOptions = {
@@ -54,17 +90,25 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/login/:userId', (req, res) => {
     const userId = req.params.userId;
-    setCookie(req, res, userId);
-    res.send(JSON.stringify({"msg":'logged in user '+userId,"userId":userId,"loggedIn":userId==undefined?false:true}));
+    let token  = setToken(req, res, userId);
+    res.send(JSON.stringify({"msg":'logged in user '+userId,"userId":userId,"loggedIn":userId==undefined?false:true,"token":token}));
 });
 
 app.get('/checkLogin', (req, res) => {
-    let userId = setCookie(req, res);
+    let userId = setToken(req, res);
     res.send(JSON.stringify({"msg":'logged in user '+userId,"userId":userId,"loggedIn":userId==undefined?false:true}));
 });
 
-app.get('/contact', (req, res) => {
-    setCookie(req, res);
+app.get('/getAllPosts', (req, res) => {
+    let userId = setToken(req, res);
+    let postId = req.query.postId;
+    let posts = userData[userId]["posts"];
+    res.send(JSON.stringify(posts));
+});
+
+app.get('/getPost', (req, res) => {
+    let userId = setToken(req, res);
+    let postId = req.query.postId;
     res.send('Contact Page');
 });
 
@@ -73,20 +117,15 @@ app.listen(port, () => {
 });
 
 //functions
-function setCookie(req, res, userId) {
-    let cookieHeader = req.headers.cookie;
-    if (!cookieHeader) {
-        console.log("new cookie set",cookies);
-        //const expires = new Date();
-        //expires.setFullYear(expires.getFullYear() + 100);
-        const expires = new Date(Date.now() + 5 * 60 * 1000);
-        cookieHeader = `tok=${generateUUID()}; Expires=${expires.toUTCString()}; HttpOnly`;
-        res.setHeader('Set-Cookie', cookieHeader);
-    }
+function setToken(req, res, userId) {
     if(userId) {
-        cookies[cookieHeader] = userId;
+        let tok = generateUUID();
+        tokens[tok] = userId;
+        return tok;
+    } else {
+        let tok = req.headers["token"];
+        return tokens[tok];
     }
-    return cookies[cookieHeader];
 }
 
 function generateUUID2() {

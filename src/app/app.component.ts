@@ -24,7 +24,7 @@ export class AppComponent {
   constructor(private router: Router,private apiCallService: ApiCallService) { }
 
   ngOnInit(): void {
-    this.apiCallService.getData("http://localhost:3000/checkLogin").subscribe((resp) => {
+    this.apiCallService.getData("http://localhost:3000/checkLogin",{}).subscribe((resp) => {
       console.log(resp.msg);
       if (resp.loggedIn) {
         console.log("marked logged in");
@@ -40,18 +40,20 @@ export class AppComponent {
 
   login() {
     sessionStorage.removeItem("userId");
+    sessionStorage.removeItem("token");
     let user = this.userId?.nativeElement.value.trim();
     if (user == "") {
       alert("user id is required");
     } else if(user.indexOf(" ")>-1) {
       alert("user id can't contain space");
     } else {
-      this.apiCallService.getData("http://localhost:3000/login/" + user).subscribe((resp) => {
+      this.apiCallService.getData("http://localhost:3000/login/" + user,{}).subscribe((resp) => {
         console.log(resp.msg);
         if (resp.loggedIn) {
           console.log("marked logged in");
           this.loggedIn = true;
           sessionStorage.setItem("userId",resp.userId);
+          sessionStorage.setItem("token",resp.token);
           this.router.navigate(['/login/']);
         }
       });
