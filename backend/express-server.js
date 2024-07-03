@@ -90,6 +90,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/login/:userId', (req, res) => {
     const userId = req.params.userId;
+    signUpIfNewUser(userId);
     let token  = setToken(req, res, userId);
     res.send(JSON.stringify({"msg":'logged in user '+userId,"userId":userId,"loggedIn":userId==undefined?false:true,"token":token}));
 });
@@ -117,6 +118,13 @@ app.listen(port, () => {
 });
 
 //functions
+
+function signUpIfNewUser(userId) {
+    if(!userData[userId]) {
+        userData[userId] = { "id": userId, "friendRequests": [], "friends": [], "posts": [], "friendsPosts": [], "notifications": [] };
+    }
+}
+
 function setToken(req, res, userId) {
     if(userId) {
         let tok = generateUUID();

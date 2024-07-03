@@ -41,6 +41,13 @@ export class AppComponent {
     });
   }
 
+  logout() {
+    this.loggedIn = false;
+    sessionStorage.removeItem("userId");
+    sessionStorage.removeItem("token");
+    this.router.navigate(['/']);
+  }
+
   login() {
     sessionStorage.removeItem("userId");
     sessionStorage.removeItem("token");

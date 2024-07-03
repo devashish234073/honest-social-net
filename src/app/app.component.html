@@ -18,6 +18,13 @@
       var(--electric-violet) 100%
     );
 
+    --red-to-pink-to-purple-vertical-gradient2: linear-gradient(
+      180deg,
+      var(--orange-red) 20%,
+      var(--vivid-pink) 70%,
+      var(--electric-violet) 80%
+    );
+
     --red-to-pink-to-purple-horizontal-gradient: linear-gradient(
       90deg,
       var(--orange-red) 0%,
@@ -95,6 +102,7 @@
     align-items: start;
     flex-wrap: wrap;
     gap: 1.25rem;
+    margin-top: 1.5rem;
   }
 
   .pill {
@@ -141,7 +149,7 @@
     display: flex;
     align-items: center;
     gap: 0.73rem;
-    margin-top: 1.5rem;
+    margin-top: 0.5rem;
   }
 
   .social-links path {
@@ -169,6 +177,23 @@
 
   .gradient-background {
     background: var(--red-to-pink-to-purple-horizontal-gradient);
+  }
+
+  #logoutBtn {
+    border-radius: 10px;
+    border:none;
+    background: var(--red-to-pink-to-purple-horizontal-gradient);
+    color:white;
+    box-shadow: 2px 2px 2px black;
+  }
+
+  #logoutBtn:active {
+    color: black;
+    background: var(--red-to-pink-to-purple-vertical-gradient2);
+  }
+
+  #logoutBtn:hover {
+    box-shadow: 4px 4px 6px black;
   }
 
   .title {
@@ -201,29 +226,6 @@
     </div>
     <div class="divider" role="separator" aria-label="Divider"></div>
     <div class="right-side">
-      <div class="pill-group">
-        @for (item of links; track item.title) {
-          <a
-            class="pill"
-            [href]="item.link"
-            target="_blank"
-            rel="noopener"sw
-          >
-            <span>{{ item.title }}</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              height="14"
-              viewBox="0 -960 960 960"
-              width="14"
-              fill="currentColor"
-            >
-              <path
-                d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h560v-280h80v280q0 33-23.5 56.5T760-120H200Zm188-212-56-56 372-372H560v-80h280v280h-80v-144L388-332Z"
-              />
-            </svg>
-          </a>
-        }
-      </div>
       <div class="social-links">
         <a
           href="https://github.com/devashish234073/honest-social-net/tree/angular-frontend-node-express-backend"
@@ -265,6 +267,30 @@
             />
           </svg>
         </a>
+        <button id="logoutBtn" (click)="logout()">Logout</button>
+      </div>
+      <div class="pill-group">
+        @for (item of links; track item.title) {
+          <a
+            class="pill"
+            [href]="item.link"
+            target="_blank"
+            rel="noopener"sw
+          >
+            <span>{{ item.title }}</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              height="14"
+              viewBox="0 -960 960 960"
+              width="14"
+              fill="currentColor"
+            >
+              <path
+                d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h560v-280h80v280q0 33-23.5 56.5T760-120H200Zm188-212-56-56 372-372H560v-80h280v280h-80v-144L388-332Z"
+              />
+            </svg>
+          </a>
+        }
       </div>
     </div>
   </div>
