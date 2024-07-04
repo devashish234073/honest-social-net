@@ -8,13 +8,20 @@ Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The appli
 
 Detailed steps:
 
-Step 1: git clone https://github.com/devashish234073/ho...
+Step 1: git clone https://github.com/devashish234073/honest-social-net
+
 Step 2: git checkout angular-frontend-node-express-backend
+
 Step 3: cd honest-social-net
+
 Step 4: npm install
+
 Step 5: ng serve
+
 Step 6: In an another tab in terminal go to the hones-social-net directory
+
 Step 7: cd backend
+
 Step 8: node express-server.js
 
 See video: https://www.youtube.com/watch?v=1ckv5RuVfYY
