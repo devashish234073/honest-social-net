@@ -37,6 +37,7 @@
     flex-grow: 1;
     margin-right: 10px;
     height:30px;
+    width:100px;
     margin-left: 5px;
 }
 .comment-button {
@@ -66,3 +67,27 @@
     margin-left: 10px;
     font-size: 14px;
 }
+.popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 39.5%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    padding: 20px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+  }
+  .popup-header {
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  .popup-close {
+    display: inline-block;
+    margin-left: 10px;
+    cursor: pointer;
+    color: red;
+  }

@@ -15,6 +15,8 @@ export class HomeComponent implements OnInit {
   userId: string | null = '';
   token: string | null = '';
   posts:any = [];
+  popupVisible = false;
+  likesToShow:String[] = [];
 
   constructor(private route: ActivatedRoute, private router: Router, private apiCallService: ApiCallService) { }
 
@@ -35,8 +37,12 @@ export class HomeComponent implements OnInit {
             console.log("resp",resp);
             if(post["comments"]) {
               post["comments"] = JSON.parse(post["comments"]);
+              console.log(`post["comments"]`,post["comments"]);
             }
-            console.log(`post["comments"]`,post["comments"]);
+            if(post["likes"]) {
+              post["likes"] = JSON.parse(post["likes"]);
+              console.log(`post["likes"]`,post["likes"]);
+            }
             if(post.imgData) {
               let blob = new Blob([new Uint8Array(post.imgData.data)], { type: 'image/jpeg' });
               let imgUrl = URL.createObjectURL(blob);
@@ -48,5 +54,18 @@ export class HomeComponent implements OnInit {
         }
       });
     }
+  }
+
+  showPopup(likedBy:string[]) {
+    this.popupVisible = true;
+    this.likesToShow = likedBy;
+  }
+
+  closePopup() {
+    this.popupVisible = false;
+  }
+
+  getLikesToShow() {
+    return this.likesToShow;
   }
 }
