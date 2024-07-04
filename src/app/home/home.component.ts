@@ -31,13 +31,24 @@ export class HomeComponent implements OnInit {
           let postId = postIds[postIndx];
           this.apiCallService.getData("http://localhost:3000/getPost?postId="+postId, { "token": this.token }).subscribe((resp) => {
             let postData = resp.body;
-            console.log(postData);
+            let headers:any = resp.headers;
+            console.log("postData",postData);
+            console.log("headers",headers);
+            console.log("headers['caption']",headers["caption"]);
+            let post:any = {};
+            if(headers["caption"]) {
+              post["caption"] = headers["caption"];
+            }
+            if(postData["caption"]) {
+              post["caption"] = postData["caption"];
+            }
             if(postData && postData.imgData) {
               let blob = new Blob([new Uint8Array(postData.imgData.data)], { type: 'image/jpeg' });
               let imgUrl = URL.createObjectURL(blob);
-              console.log(imgUrl);
-              this.posts.push({"imageUrl":imgUrl});
+              post["imageUrl"] = imgUrl;
             }
+            console.log(post);
+            this.posts.push(post);
           });
         }
       });

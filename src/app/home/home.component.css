@@ -1,0 +1,49 @@
+.post {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    width: 350px;
+    margin: 20px auto;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.username {
+    font-weight: bold;
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+.caption {
+    margin-bottom: 10px;
+    font-size: 1em;
+}
+.post-image {
+    width: 100%;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+.actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.like-button {
+    background-color: #008CBA;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.comment-box {
+    flex-grow: 1;
+    margin-right: 10px;
+    height:30px;
+    margin-left: 5px;
+}
+.comment-button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
