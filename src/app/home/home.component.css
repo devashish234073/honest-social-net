@@ -47,3 +47,22 @@
     border-radius: 5px;
     cursor: pointer;
 }
+.comments {
+    margin-top: 10px;
+    border-top: 1px solid #eee;
+    padding-top: 10px;
+}
+.comment {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+.comment-username {
+    font-weight: bold;
+    font-size: 14px;
+}
+.comment-text {
+    flex-grow: 1;
+    margin-left: 10px;
+    font-size: 14px;
+}
