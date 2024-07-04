@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiCallService } from '../api-call.service';
 import { CommonModule } from '@angular/common';
@@ -14,9 +14,10 @@ export class HomeComponent implements OnInit {
 
   userId: string | null = '';
   token: string | null = '';
-  posts:any = [];
+  posts: any = [];
   popupVisible = false;
-  likesToShow:String[] = [];
+  likesToShow: String[] = [];
+  @ViewChild("popup") popup?: ElementRef;
 
   constructor(private route: ActivatedRoute, private router: Router, private apiCallService: ApiCallService) { }
 
@@ -31,34 +32,42 @@ export class HomeComponent implements OnInit {
         console.log(postIds);
         for (let postIndx = 0; postIndx < postIds.length; postIndx++) {
           let postId = postIds[postIndx];
-          this.apiCallService.getData("http://localhost:3000/getPost?postId="+postId, { "token": this.token }).subscribe((resp) => {
-            let post:any = resp.body;
-            let headers:any = resp.headers;
-            console.log("resp",resp);
-            if(post["comments"]) {
-              post["comments"] = JSON.parse(post["comments"]);
-              console.log(`post["comments"]`,post["comments"]);
+          this.apiCallService.getData("http://localhost:3000/getPost?postId=" + postId, { "token": this.token }).subscribe((resp) => {
+            let post: any = resp.body;
+            let headers: any = resp.headers;
+            if (post) {
+              console.log("resp", resp);
+              if (post["comments"]) {
+                post["comments"] = JSON.parse(post["comments"]);
+                console.log(`post["comments"]`, post["comments"]);
+              }
+              if (post["likes"]) {
+                post["likes"] = JSON.parse(post["likes"]);
+                console.log(`post["likes"]`, post["likes"]);
+              }
+              if (post.imgData) {
+                let blob = new Blob([new Uint8Array(post.imgData.data)], { type: 'image/jpeg' });
+                let imgUrl = URL.createObjectURL(blob);
+                post["imageUrl"] = imgUrl;
+              }
+              console.log("added post", post);
+              this.posts.push(post);
             }
-            if(post["likes"]) {
-              post["likes"] = JSON.parse(post["likes"]);
-              console.log(`post["likes"]`,post["likes"]);
-            }
-            if(post.imgData) {
-              let blob = new Blob([new Uint8Array(post.imgData.data)], { type: 'image/jpeg' });
-              let imgUrl = URL.createObjectURL(blob);
-              post["imageUrl"] = imgUrl;
-            }
-            console.log(post);
-            this.posts.push(post);
           });
         }
       });
     }
   }
 
-  showPopup(likedBy:string[]) {
+  showPopup(event: MouseEvent, likedBy: string[]) {
     this.popupVisible = true;
     this.likesToShow = likedBy;
+    let top = `${event.clientY + 90}px`;
+    let left = `${event.clientX + 100}px`;
+    if (this.popup) {
+      this.popup.nativeElement.style.top = top;
+      this.popup.nativeElement.style.left = left;
+    }
   }
 
   closePopup() {

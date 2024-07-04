@@ -70,8 +70,6 @@
 .popup {
     display: none;
     position: fixed;
-    top: 50%;
-    left: 39.5%;
     transform: translate(-50%, -50%);
     width: 300px;
     padding: 20px;

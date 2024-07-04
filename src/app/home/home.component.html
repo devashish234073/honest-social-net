@@ -3,7 +3,7 @@
     <div class="caption">{{post.caption}}</div>
     <img [src]="post.imageUrl" alt="Post Image" class="post-image">
     <div class="actions">
-        <button class="like-button" (mouseover)="showPopup(post.likes)" (mouseout)="closePopup()">Like ({{post.likes.length}})</button>
+        <button class="like-button" (mouseover)="showPopup($event,post.likes)" (mouseout)="closePopup()">Like ({{post.likes.length}})</button>
         <input type="text" placeholder="Write a comment..." class="comment-box">
         <button class="comment-button">Comment</button>
     </div>
@@ -15,7 +15,7 @@
         </div>
     </div>
 </div>
-<div class="popup" [ngStyle]="{display: popupVisible ? 'block' : 'none'}" id="popup">
+<div class="popup" [ngStyle]="{display: popupVisible ? 'block' : 'none'}" id="popup" #popup>
     <div class="popup-header">
         Liked By
         <span class="popup-close" (click)="closePopup()">[X]</span>
