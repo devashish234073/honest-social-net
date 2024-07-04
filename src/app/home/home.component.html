@@ -1,5 +1,5 @@
 <div *ngFor="let post of posts" class="post">
-    <div class="username">Username</div>
+    <div class="username">{{post.userId}}</div>
     <div class="caption">{{post.caption}}</div>
     <img [src]="post.imageUrl" alt="Post Image" class="post-image">
     <div class="actions">
@@ -7,15 +7,11 @@
         <input type="text" placeholder="Write a comment..." class="comment-box">
         <button class="comment-button">Comment</button>
     </div>
-    <hr>
-    <div class="comments">
-        <div class="comment">
-            <div class="comment-username">User1</div>
-            <div class="comment-text">This is a comment.</div>
-        </div>
-        <div class="comment">
-            <div class="comment-username">User2</div>
-            <div class="comment-text">Another comment.</div>
+    <hr *ngIf="post.comments && post.comments.length>0">
+    <div class="comments" *ngIf="post.comments && post.comments.length>0">
+        <div class="comment" *ngFor="let comment of post.comments">
+            <div class="comment-username">{{comment.user}}</div>
+            <div class="comment-text">{{comment.comment}}</div>
         </div>
     </div>
 </div>

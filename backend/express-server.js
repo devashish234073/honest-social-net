@@ -103,7 +103,7 @@ app.get('/checkLogin', (req, res) => {
 app.get('/getAllPosts', (req, res) => {
     let userId = setToken(req, res);
     let postId = req.query.postId;
-    if(!userData[userId]) {
+    if (!userData[userId]) {
         res.send("[]");
     } else {
         let posts = userData[userId]["posts"];
@@ -123,18 +123,20 @@ app.get('/getPost', (req, res) => {
                 if (err) {
                     res.status(500).send('Error reading the image file');
                 } else {
-                    res.writeHead(200, { 'Content-Type': 'application/json', 'caption': post.caption, 'date': post.date, 'likes': likes, 'comments': JSON.stringify(post.comments) });
-                    let imgData = {"imgData":data};
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    let imgData = { "userId":userId,"imgData": data ,'caption': post.caption, 'date': post.date, 'likes': likes, 'comments': JSON.stringify(post.comments) };
                     res.end(JSON.stringify(imgData));
                 }
             });
         } else {
+            let captionObj = {};
             if (image != null && image.indexOf("http") == 0) {
-                res.writeHead(200, { 'Content-Type': 'application/json', 'imageUrl': image, 'date': post.date, 'likes': likes, 'comments': JSON.stringify(post.comments) });
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                captionObj = {"userId":userId,"caption": post.caption , 'imageUrl': image, 'date': post.date, 'likes': likes, 'comments': JSON.stringify(post.comments)};
             } else {
-                res.writeHead(200, { 'Content-Type': 'application/json', 'date': post.date, 'likes': likes, 'comments': JSON.stringify(post.comments) });
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                captionObj = {"userId":userId,"caption": post.caption, 'date': post.date, 'likes': likes, 'comments': JSON.stringify(post.comments) };
             }
-            let captionObj = {"caption":post.caption};
             res.end(JSON.stringify(captionObj));
         }
     } else {

@@ -30,20 +30,15 @@ export class HomeComponent implements OnInit {
         for (let postIndx = 0; postIndx < postIds.length; postIndx++) {
           let postId = postIds[postIndx];
           this.apiCallService.getData("http://localhost:3000/getPost?postId="+postId, { "token": this.token }).subscribe((resp) => {
-            let postData = resp.body;
+            let post:any = resp.body;
             let headers:any = resp.headers;
-            console.log("postData",postData);
-            console.log("headers",headers);
-            console.log("headers['caption']",headers["caption"]);
-            let post:any = {};
-            if(headers["caption"]) {
-              post["caption"] = headers["caption"];
+            console.log("resp",resp);
+            if(post["comments"]) {
+              post["comments"] = JSON.parse(post["comments"]);
             }
-            if(postData["caption"]) {
-              post["caption"] = postData["caption"];
-            }
-            if(postData && postData.imgData) {
-              let blob = new Blob([new Uint8Array(postData.imgData.data)], { type: 'image/jpeg' });
+            console.log(`post["comments"]`,post["comments"]);
+            if(post.imgData) {
+              let blob = new Blob([new Uint8Array(post.imgData.data)], { type: 'image/jpeg' });
               let imgUrl = URL.createObjectURL(blob);
               post["imageUrl"] = imgUrl;
             }
