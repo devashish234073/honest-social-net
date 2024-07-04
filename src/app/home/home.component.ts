@@ -35,7 +35,7 @@ export class HomeComponent implements OnInit {
           this.apiCallService.getData("http://localhost:3000/getPost?postId=" + postId, { "token": this.token }).subscribe((resp) => {
             let post: any = resp.body;
             let headers: any = resp.headers;
-            if (post) {
+            if (post && post.postId) {
               console.log("resp", resp);
               if (post["comments"]) {
                 post["comments"] = JSON.parse(post["comments"]);
@@ -52,6 +52,8 @@ export class HomeComponent implements OnInit {
               }
               console.log("added post", post);
               this.posts.push(post);
+            } else {
+              console.log("invalid post "+postId,resp);
             }
           });
         }

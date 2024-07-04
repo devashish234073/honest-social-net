@@ -107,6 +107,15 @@ app.get('/getAllPosts', (req, res) => {
         res.send("[]");
     } else {
         let posts = userData[userId]["posts"];
+        if(userData[userId]["friends"] && userData[userId]["friends"].length>0) {
+            for(let fIndx in userData[userId]["friends"]) {
+                let friendId = userData[userId]["friends"][fIndx];
+                let friend = userData[friendId];
+                if(friend && friend["posts"] && friend["posts"].length>0) {
+                    posts = [...posts,...friend["posts"]];
+                }
+            }
+        }
         res.send(JSON.stringify(posts));
     }
 });
@@ -115,32 +124,38 @@ app.get('/getPost', (req, res) => {
     let userId = setToken(req, res);
     let postId = req.query.postId;
     let post = posts[postId];
-    if (userData[userId] && post && userData[userId]["posts"].indexOf(postId) > -1) {
-        let image = post.image;
-        let likes = JSON.stringify(post["likes"] ? post["likes"] : []);
-        if (image != null && image.indexOf("http") != 0) {
-            fs.readFile("uploads/" + image, (err, data) => {
-                if (err) {
-                    res.status(500).send('Error reading the image file');
+    if(userData[userId] && post) {
+        let isSelfPost = (userData[userId]["posts"].indexOf(postId) > -1 && post.userId==userId);
+        let isFriendsPost = (userData[userId]["friends"] && userData[userId]["friends"].indexOf(post.userId)>-1);
+        if (isSelfPost || isFriendsPost) {
+            let image = post.image;
+            let likes = JSON.stringify(post["likes"] ? post["likes"] : []);
+            if (image != null && image.indexOf("http") != 0) {
+                fs.readFile("uploads/" + image, (err, data) => {
+                    if (err) {
+                        res.status(500).send('Error reading the image file');
+                    } else {
+                        res.writeHead(200, { 'Content-Type': 'application/json' });
+                        let imgData = { "postId":postId,"userId":post.userId,"imgData": data ,'caption': post.caption, 'date': post.date, 'likes': likes, 'comments': JSON.stringify(post.comments) };
+                        res.end(JSON.stringify(imgData));
+                    }
+                });
+            } else {
+                let captionObj = {};
+                if (image != null && image.indexOf("http") == 0) {
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    captionObj = {"postId":postId,"userId":post.userId,"caption": post.caption , 'imageUrl': image, 'date': post.date, 'likes': likes, 'comments': JSON.stringify(post.comments)};
                 } else {
                     res.writeHead(200, { 'Content-Type': 'application/json' });
-                    let imgData = { "userId":userId,"imgData": data ,'caption': post.caption, 'date': post.date, 'likes': likes, 'comments': JSON.stringify(post.comments) };
-                    res.end(JSON.stringify(imgData));
+                    captionObj = {"postId":postId,"userId":post.userId,"caption": post.caption, 'date': post.date, 'likes': likes, 'comments': JSON.stringify(post.comments) };
                 }
-            });
-        } else {
-            let captionObj = {};
-            if (image != null && image.indexOf("http") == 0) {
-                res.writeHead(200, { 'Content-Type': 'application/json' });
-                captionObj = {"userId":userId,"caption": post.caption , 'imageUrl': image, 'date': post.date, 'likes': likes, 'comments': JSON.stringify(post.comments)};
-            } else {
-                res.writeHead(200, { 'Content-Type': 'application/json' });
-                captionObj = {"userId":userId,"caption": post.caption, 'date': post.date, 'likes': likes, 'comments': JSON.stringify(post.comments) };
+                res.end(JSON.stringify(captionObj));
             }
-            res.end(JSON.stringify(captionObj));
+        } else {
+            res.end('{}');
         }
     } else {
-        res.end('');
+        res.end('{}');
     }
 });
 
