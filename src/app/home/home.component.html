@@ -1,3 +1,13 @@
+<div class="post">
+    <div class="postHeader">Write a post</div>
+    <div class="caption"><textarea id="post-content"></textarea></div>
+    <input type="file" class="file-chooser" *ngIf="!generateWithAI">
+    <div class="actions">
+        <span><input type="checkbox" (click)="setGenerateWithAI($event)">Generate with AI</span>
+        <button class="comment-button">Post</button>
+    </div>
+</div>
+<hr *ngIf="posts && posts.length>0">
 <div *ngFor="let post of posts" class="post" [id]="post.postId">
     <div class="username">{{post.userId}}</div>
     <div class="caption">{{post.caption}}</div>

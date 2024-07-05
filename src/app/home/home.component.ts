@@ -16,6 +16,7 @@ export class HomeComponent implements OnInit {
   token: string | null = '';
   posts: any = [];
   popupVisible = false;
+  generateWithAI = false;
   likesToShow: String[] = [];
   @ViewChild("popup") popup?: ElementRef;
 
@@ -59,6 +60,11 @@ export class HomeComponent implements OnInit {
         }
       });
     }
+  }
+
+  setGenerateWithAI(event: Event) {
+    const checkbox = event.target as HTMLInputElement;
+    this.generateWithAI = checkbox.checked;
   }
 
   showPopup(event: MouseEvent, likedBy: string[]) {
