@@ -59,6 +59,13 @@
     border-radius: 5px;
     cursor: pointer;
 }
+button:disabled {
+    cursor: not-allowed;
+    background-color: gray;
+}
+button:active {
+    color: black;
+}
 .comments {
     margin-top: 10px;
     border-top: 1px solid #eee;

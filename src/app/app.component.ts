@@ -42,6 +42,8 @@ export class AppComponent {
           this.router.navigate(['/']);
         }
       });
+    } else {
+      this.loggedIn = false;
     }
   }
 

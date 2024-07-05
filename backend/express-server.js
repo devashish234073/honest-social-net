@@ -106,11 +106,22 @@ app.get('/searchUser', (req, res) => {
     let obj = {};
     let userSearched = userData[userIdToSearch];
     let user = userData[userId];
-    if(userSearched) {
+    if(userIdToSearch==userId) {
+        obj["error"] = `You can't send friend request to yourself.`;
+    } else if(userSearched) {
         obj["userId"] = userSearched.id;
         obj["friends"] = userSearched.friends?userSearched.friends.length:0;
         obj["totalPosts"] = userSearched.posts?userSearched.posts.length:0;
         obj["mutualFriends"] = [];
+        if(userSearched.friends.indexOf(userId)>-1) {
+            obj["buttonLabel"] = "You two are already friends";
+        } else if(userSearched.friendRequests.indexOf(userId)>-1) {
+            obj["buttonLabel"] = "Friend Request Already Sent";
+        } else if(user.friendRequests.indexOf(userIdToSearch)>-1) {
+            obj["buttonLabel"] = "You already have a friend request from "+userIdToSearch;
+        } else {
+            obj["buttonLabel"] = "Send Friend Request";
+        }
         if(userSearched.friends && userSearched.friends.length>0 && user.friends && user.friends.length>0) {
             for(let friendIndx in user.friends) {
                 let friendId = user.friends[friendIndx];

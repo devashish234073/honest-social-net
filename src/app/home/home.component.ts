@@ -69,8 +69,7 @@ export class HomeComponent implements OnInit {
   searchFriend() {
     let friendId = this.friendIdRef?.nativeElement.value.trim();
     if(!friendId || friendId=="") {
-      alert("Enter friend id to search");
-      this.friendOutput = {};
+      this.friendOutput = {"error":"Enter friend id to search"};
     } else {
       this.apiCallService.getData("http://localhost:3000/searchUser?userIdToSearch=" + friendId, { "token": this.token }).subscribe((resp) => {
         let respBody = resp.body;
