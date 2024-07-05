@@ -32,7 +32,7 @@ The login page is recreated inspired from default home page that angular creates
 
 UI after adding post section and search friend section:
 
-![image](https://github.com/devashish234073/honest-social-net/assets/20777854/57ade9af-1a57-441e-a3b5-598440eb6ea4)
+<img src="(https://github.com/devashish234073/honest-social-net/assets/20777854/57ade9af-1a57-441e-a3b5-598440eb6ea4" width="600" height="500">
 
 
 Sending friend request to themselves user will get this error:
