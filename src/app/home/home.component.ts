@@ -19,6 +19,7 @@ export class HomeComponent implements OnInit {
   generateWithAI = false;
   likesToShow: String[] = [];
   @ViewChild("popup") popup?: ElementRef;
+  @ViewChild("aicheckbox") aicheckboxref?: ElementRef;
 
   constructor(private route: ActivatedRoute, private router: Router, private apiCallService: ApiCallService) { }
 
@@ -62,9 +63,22 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  setGenerateWithAI(event: Event) {
-    const checkbox = event.target as HTMLInputElement;
-    this.generateWithAI = checkbox.checked;
+  toggleCheckbox() {
+    if(this.aicheckboxref) {
+      let aicheckbox = this.aicheckboxref.nativeElement;
+      if(aicheckbox.checked) {
+        aicheckbox.checked = false;
+      } else {
+        aicheckbox.checked = true;
+      }
+      this.setGenerateWithAI();
+    }
+  }
+
+  setGenerateWithAI() {
+    if(this.aicheckboxref) {
+      this.generateWithAI = this.aicheckboxref.nativeElement.checked;
+    }
   }
 
   showPopup(event: MouseEvent, likedBy: string[]) {
