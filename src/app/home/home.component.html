@@ -11,7 +11,19 @@
 <div class="post">
     <div class="actions">
         <div class="caption"><input type="text" class="friend-id-box" placeholder="Search friend by id" #friendId></div>
-        <button class="comment-button">Search</button>
+        <button class="comment-button" (click)="searchFriend()">Search</button>
+    </div>
+    <div *ngIf="friendOutput.error" class="error">{{friendOutput.error}}</div>
+    <div *ngIf="friendOutput.userId" class="msg">{{friendOutput.userId+" has "+friendOutput.friends+" friends and "+friendOutput.totalPosts+" posts."}}</div>
+    <div *ngIf="friendOutput.mutualFriends && friendOutput.mutualFriends.length>0" class="msg">
+        <span>You have {{friendOutput.mutualFriends.length}} mutual friends with {{friendOutput.userId}}</span>
+        <ul>
+            <li *ngFor="let mutualFriend of friendOutput.mutualFriends">{{mutualFriend}}</li>
+        </ul>
+    </div>
+    <div class="actions" *ngIf="friendOutput.userId">
+        <span></span>
+        <button class="comment-button" (click)="sendFriendRequest()">Send Friends Request</button>
     </div>
 </div>
 <hr *ngIf="posts && posts.length>0">

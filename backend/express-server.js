@@ -100,6 +100,31 @@ app.get('/checkLogin', (req, res) => {
     res.send(JSON.stringify({ "msg": 'logged in user ' + userId, "userId": userId, "loggedIn": userId == undefined ? false : true }));
 });
 
+app.get('/searchUser', (req, res) => {
+    let userId = setToken(req, res);
+    const userIdToSearch = req.query.userIdToSearch;
+    let obj = {};
+    let userSearched = userData[userIdToSearch];
+    let user = userData[userId];
+    if(userSearched) {
+        obj["userId"] = userSearched.id;
+        obj["friends"] = userSearched.friends?userSearched.friends.length:0;
+        obj["totalPosts"] = userSearched.posts?userSearched.posts.length:0;
+        obj["mutualFriends"] = [];
+        if(userSearched.friends && userSearched.friends.length>0 && user.friends && user.friends.length>0) {
+            for(let friendIndx in user.friends) {
+                let friendId = user.friends[friendIndx];
+                if(userSearched.friends.indexOf(friendId)>-1) {
+                    obj["mutualFriends"].push(friendId);
+                }
+            }
+        }
+    } else {
+        obj["error"] = `User ${userIdToSearch} not found.`;
+    }
+    res.send(JSON.stringify(obj));
+});
+
 app.get('/getAllPosts', (req, res) => {
     let userId = setToken(req, res);
     let postId = req.query.postId;

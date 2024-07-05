@@ -100,3 +100,10 @@
     cursor: pointer;
     color: red;
   }
+  .error {
+    color: red;
+    padding-left: 5px;
+  }
+  .msg {
+    padding-left: 5px;
+  }

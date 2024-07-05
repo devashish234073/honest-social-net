@@ -18,7 +18,9 @@ export class HomeComponent implements OnInit {
   popupVisible = false;
   generateWithAI = false;
   likesToShow: String[] = [];
+  friendOutput:any = {};
   @ViewChild("popup") popup?: ElementRef;
+  @ViewChild("friendId") friendIdRef?: ElementRef;
   @ViewChild("aicheckbox") aicheckboxref?: ElementRef;
 
   constructor(private route: ActivatedRoute, private router: Router, private apiCallService: ApiCallService) { }
@@ -26,6 +28,7 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {
     this.userId = sessionStorage.getItem("userId");
     this.token = sessionStorage.getItem("token");
+    this.friendOutput = {};
     if (!this.userId || this.userId == '' || !this.token || this.token == '') {
       this.router.navigate(['/']);
     } else {
@@ -61,6 +64,24 @@ export class HomeComponent implements OnInit {
         }
       });
     }
+  }
+
+  searchFriend() {
+    let friendId = this.friendIdRef?.nativeElement.value.trim();
+    if(!friendId || friendId=="") {
+      alert("Enter friend id to search");
+      this.friendOutput = {};
+    } else {
+      this.apiCallService.getData("http://localhost:3000/searchUser?userIdToSearch=" + friendId, { "token": this.token }).subscribe((resp) => {
+        let respBody = resp.body;
+        this.friendOutput = respBody;
+        console.log("friend search result",this.friendOutput);
+      });
+    }
+  }
+
+  sendFriendRequest() {
+    
   }
 
   toggleCheckbox() {
