@@ -35,8 +35,19 @@ UI after adding post section and search friend section:
 ![image](https://github.com/devashish234073/honest-social-net/assets/20777854/57ade9af-1a57-441e-a3b5-598440eb6ea4)
 
 
-Implemented calls to view self posts also added likes count and existing comments.
+Sending friend request to themselves user will get this error:
 
-![image](https://github.com/devashish234073/honest-social-net/assets/20777854/dedb98f9-ed22-4f71-a447-9761a8eb136e)
+![image](https://github.com/devashish234073/honest-social-net/assets/20777854/03aa4343-c415-45e6-8a45-d5249a2df666)
+
+Searching a user who is already a friend user will see this:
+
+![image](https://github.com/devashish234073/honest-social-net/assets/20777854/e8b6bf31-ca1d-469d-8150-20721e18c43a)
+
+This is how the like button popup shows:
+
+![image](https://github.com/devashish234073/honest-social-net/assets/20777854/d8cc7cbd-fa2b-4266-8552-7e7834cd131f)
+
+
+
 
 
