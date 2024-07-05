@@ -38,12 +38,18 @@
     border-radius: 5px;
     cursor: pointer;
 }
-.comment-box {
+.comment-box, .friend-id-box {
     flex-grow: 1;
     margin-right: 10px;
     height:30px;
     width:100px;
     margin-left: 5px;
+}
+
+.friend-id-box {
+    margin-top: 10px;
+    width: 250px;
+    outline: none;
 }
 .comment-button {
     background-color: #4CAF50;

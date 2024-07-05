@@ -7,6 +7,13 @@
         <button class="comment-button">Post</button>
     </div>
 </div>
+<hr>
+<div class="post">
+    <div class="actions">
+        <div class="caption"><input type="text" class="friend-id-box" placeholder="Search friend by id" #friendId></div>
+        <button class="comment-button">Search</button>
+    </div>
+</div>
 <hr *ngIf="posts && posts.length>0">
 <div *ngFor="let post of posts" class="post" [id]="post.postId">
     <div class="username">{{post.userId}}</div>
