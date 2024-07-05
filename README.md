@@ -28,7 +28,7 @@ See video: https://www.youtube.com/watch?v=1ckv5RuVfYY
 
 The login page is recreated inspired from default home page that angular creates in a new app:
 
-<img src="https://github.com/devashish234073/honest-social-net/assets/20777854/4e3b5479-47ff-44b7-be9b-94d129c10670" width="600" height="200">
+<img src="https://github.com/devashish234073/honest-social-net/assets/20777854/4e3b5479-47ff-44b7-be9b-94d129c10670" width="600" height="250">
 
 UI after adding post section and search friend section:
 
