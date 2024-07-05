@@ -136,6 +136,10 @@ app.get('/searchUser', (req, res) => {
     res.send(JSON.stringify(obj));
 });
 
+app.get('/sendFriendRequest', (req, res) => {
+
+});
+
 app.get('/getAllPosts', (req, res) => {
     let userId = setToken(req, res);
     let postId = req.query.postId;
