@@ -220,7 +220,14 @@
 <main class="main">
   <div class="content">
     <div class="left-side">
-      <h2 class="title gradient-background">{{ title }}</h2>
+      <h2 class="title gradient-background">{{ title }}</h2><div class="menu" *ngIf="loggedIn">
+        <button class="menu-button">Menu</button>
+        <div class="menu-content">
+            <a href="#">Friend Requests</a>
+            <a href="#">Notifications</a>
+            <a href="#">Friends</a>
+        </div>
+    </div>
       <input *ngIf="!loggedIn" type="text" class="userid" placeholder="user id" #userId>
       <button *ngIf="!loggedIn" class="btn gradient-background" (click)="login()">Login</button>
       <router-outlet></router-outlet>

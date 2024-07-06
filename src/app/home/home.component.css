@@ -85,6 +85,9 @@ button:active {
     margin-left: 10px;
     font-size: 14px;
 }
+textarea {
+    resize: none;
+}
 .popup {
     display: none;
     position: fixed;
