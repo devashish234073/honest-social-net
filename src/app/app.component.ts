@@ -31,14 +31,12 @@ export class AppComponent {
     this.token = sessionStorage.getItem("token");
     if(this.token) {
       this.apiCallService.getData("http://localhost:3000/checkLogin",{"token":this.token}).subscribe((resp) => {
-        console.log("resp",resp);
-        console.log(resp.body.msg);
         if (resp.body.loggedIn) {
-          console.log("marked logged in");
+          console.log("marked logged in",resp.body);
           sessionStorage.setItem("userId",resp.body.userId);
           this.loggedIn = true;
-          this.router.navigate(['/login']);
           this.getMenuData();
+          this.router.navigate(['/login']);
         } else {
           this.loggedIn = false;
           sessionStorage.removeItem("userId");
@@ -96,8 +94,10 @@ export class AppComponent {
           this.loggedIn = true;
           sessionStorage.setItem("userId",resp.body.userId);
           sessionStorage.setItem("token",resp.body.token);
-          this.router.navigate(['/login/']);
+          this.userId = resp.body.userId;
+          this.token = resp.body.token;
           this.getMenuData();
+          this.router.navigate(['/login/']);
         }
       });
     }

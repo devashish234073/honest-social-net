@@ -16,7 +16,7 @@ export class ApiCallService {
     return this.http.get<any>(`${url}`, { headers, observe: 'response' }).pipe(
       map(response => response),
       catchError(error => {
-        console.error('Error occurred:', error);
+        console.error(`Error occurred calling ${url} headers(${JSON.stringify(headersData)}):`, error);
         sessionStorage.removeItem("token");
         sessionStorage.removeItem("userId");
         this.router.navigate(['/']);

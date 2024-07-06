@@ -138,8 +138,9 @@ app.get('/searchUser', (req, res) => {
 
 app.get('/getUserData', (req, res) => {
     let userId = setToken(req, res);
+    console.log("getting user with id",userId);
     let user = userData[userId];
-    let obj = {"friendRequests":[],"notifications":[],"friends":[]};;
+    let obj = {"friendRequests":[],"notifications":[],"friends":[]};
     if(user) {
         obj["friendRequests"] = user.friendRequests;
         obj["notifications"] = user.notifications;
