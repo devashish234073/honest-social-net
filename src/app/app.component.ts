@@ -80,6 +80,7 @@ export class AppComponent {
           sessionStorage.setItem("userId",resp.body.userId);
           sessionStorage.setItem("token",resp.body.token);
           this.router.navigate(['/login/']);
+          this.getMenuData();
         }
       });
     }
