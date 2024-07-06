@@ -16,7 +16,7 @@ export class AppComponent {
   token:string | null = '';
   loggedIn = false;
   menuData = {"friendRequests":[],"notifications":[],"friends":[]};
-  friendRequests:any = [];
+  popupData:any = {"friendRequests":[],"notifications":[],"friends":[]};//at a time only one value should be populated
   @ViewChild("userId") userId?: ElementRef;
 
   links = [
@@ -50,7 +50,7 @@ export class AppComponent {
 
   getMenuData() {
     this.apiCallService.getData("http://localhost:3000/getUserData",{"token":this.token}).subscribe((resp) => {
-      console.log("menu data",resp);
+      console.log("menu data",resp.body);
       this.menuData = resp.body;
     });
   }
@@ -63,11 +63,22 @@ export class AppComponent {
   }
 
   openFriendReqDialog() {
-    this.friendRequests = [{"name":"Hello","message":"hello as"}];
+    this.popupData = {"friendRequests":[],"notifications":[],"friends":[]};
+    this.popupData["friendRequests"] = this.menuData["friendRequests"];
   }
 
-  closeFriendReqDialog() {
-    this.friendRequests = [];
+  openNotificationsDialog() {
+    this.popupData = {"friendRequests":[],"notifications":[],"friends":[]};
+    this.popupData["notifications"] = this.menuData["notifications"];
+  }
+
+  openFriendsDialog() {
+    this.popupData = {"friendRequests":[],"notifications":[],"friends":[]};
+    this.popupData["friends"] = this.menuData["friends"];
+  }
+
+  closeDialog() {
+    this.popupData = {"friendRequests":[],"notifications":[],"friends":[]};
   }
 
   acceptFriendRequest(request:any) {
@@ -75,6 +86,10 @@ export class AppComponent {
   }
 
   rejectFriendRequest(request:any) {
+
+  }
+
+  unfriend(friendId:any) {
 
   }
 
