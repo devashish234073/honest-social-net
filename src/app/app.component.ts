@@ -15,6 +15,7 @@ export class AppComponent {
   title = 'honest-social-net';
   token:string | null = '';
   loggedIn = false;
+  menuData = {"friendRequests":[],"notifications":[],"friends":[]};
   @ViewChild("userId") userId?: ElementRef;
 
   links = [
@@ -36,6 +37,7 @@ export class AppComponent {
           sessionStorage.setItem("userId",resp.body.userId);
           this.loggedIn = true;
           this.router.navigate(['/login']);
+          this.getMenuData();
         } else {
           this.loggedIn = false;
           sessionStorage.removeItem("userId");
@@ -45,6 +47,13 @@ export class AppComponent {
     } else {
       this.loggedIn = false;
     }
+  }
+
+  getMenuData() {
+    this.apiCallService.getData("http://localhost:3000/getUserData",{"token":this.token}).subscribe((resp) => {
+      console.log("menu data",resp);
+      this.menuData = resp.body;
+    });
   }
 
   logout() {
