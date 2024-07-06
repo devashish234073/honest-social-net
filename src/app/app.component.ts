@@ -16,6 +16,7 @@ export class AppComponent {
   token:string | null = '';
   loggedIn = false;
   menuData = {"friendRequests":[],"notifications":[],"friends":[]};
+  friendRequests:any = [];
   @ViewChild("userId") userId?: ElementRef;
 
   links = [
@@ -61,6 +62,22 @@ export class AppComponent {
     sessionStorage.removeItem("userId");
     sessionStorage.removeItem("token");
     this.router.navigate(['/']);
+  }
+
+  openFriendReqDialog() {
+    this.friendRequests = [{"name":"Hello","message":"hello as"}];
+  }
+
+  closeFriendReqDialog() {
+    this.friendRequests = [];
+  }
+
+  acceptFriendRequest(request:any) {
+
+  }
+
+  rejectFriendRequest(request:any) {
+
   }
 
   login() {

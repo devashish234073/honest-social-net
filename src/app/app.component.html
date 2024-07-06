@@ -223,7 +223,7 @@
       <h2 class="title gradient-background">{{ title }}</h2><div class="menu" *ngIf="loggedIn">
         <button class="menu-button">Menu</button>
         <div class="menu-content">
-            <a href="#">Friend Requests<div class="count-circle" *ngIf="menuData.friendRequests && menuData.friendRequests.length>0">{{menuData.friendRequests.length}}</div></a>
+            <a (click)="openFriendReqDialog()">Friend Requests<div class="count-circle" *ngIf="menuData.friendRequests && menuData.friendRequests.length>0">{{menuData.friendRequests.length}}</div></a>
             <a href="#">Notifications<div class="count-circle" *ngIf="menuData.notifications && menuData.notifications.length>0">{{menuData.notifications.length}}</div></a>
             <a href="#">Friends<div class="count-circle" *ngIf="menuData.friends && menuData.friends.length>0">{{menuData.friends.length}}</div></a>
         </div>
@@ -303,3 +303,19 @@
     </div>
   </div>
 </main>
+<div id="friendRequestDialog" class="dialog" *ngIf="friendRequests && friendRequests.length>0">
+  <div class="dialog-content">
+    <span class="close" (click)="closeFriendReqDialog()">&times;</span>
+    <h3>Friend Requests</h3>
+    <div *ngFor="let request of friendRequests" class="friend-card">
+      <div class="card-content">
+        <p>{{ request.name }}</p>
+        <p>{{ request.message }}</p>
+      </div>
+      <div class="card-actions">
+        <button (click)="acceptFriendRequest(request)">Accept</button>
+        <button (click)="rejectFriendRequest(request)">Reject</button>
+      </div>
+    </div>
+  </div>
+</div>
