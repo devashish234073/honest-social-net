@@ -71,6 +71,12 @@
     width: 40%; 
     padding-top: 0px;
   }
+
+  @media screen and (max-width: 992px) {
+    .dialog-content {
+      width: 80%;
+    }
+  }
   
   .close {
     color: #aaa;
@@ -78,6 +84,10 @@
     margin-top: 11px;
     font-size: 28px;
     font-weight: bold;
+  }
+
+  .close-notification {
+    margin-top: -35px !important;
   }
   
   .close:hover,

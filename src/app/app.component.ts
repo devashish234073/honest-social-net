@@ -85,6 +85,10 @@ export class AppComponent {
 
   }
 
+  deleteNotification(notification:String) {
+
+  }
+
   rejectFriendRequest(request:any) {
 
   }
