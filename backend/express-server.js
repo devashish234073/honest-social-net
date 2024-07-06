@@ -136,6 +136,18 @@ app.get('/searchUser', (req, res) => {
     res.send(JSON.stringify(obj));
 });
 
+app.get('/getUserData', (req, res) => {
+    let userId = setToken(req, res);
+    let user = userData[userId];
+    let obj = {"friendRequests":[],"notifications":[],"friends":[]};;
+    if(user) {
+        obj["friendRequests"] = user.friendRequests;
+        obj["notifications"] = user.notifications;
+        obj["friends"] = user.friends; 
+    }
+    res.send(JSON.stringify(obj));
+});
+
 app.get('/sendFriendRequest', (req, res) => {
 
 });
