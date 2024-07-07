@@ -85,11 +85,26 @@ export class AppComponent {
   }
 
   acceptFriendRequest(friendId:any) {
-
+    this.apiCallService.getData("http://localhost:3000/acceptFriendRequest?friendId="+friendId,{"token":this.token}).subscribe((resp) => {
+      if(resp.body.message && resp.body.friendRequests && resp.body.friends) {
+        this.menuData.friendRequests = resp.body.friendRequests;
+        this.popupData.friendRequests = resp.body.friendRequests;
+        this.menuData.friends = resp.body.friends;
+      } else if(resp.body.message){
+        alert(resp.body.message);
+      }
+    });
   }
 
   rejectFriendRequest(friendId:any) {
-
+    this.apiCallService.getData("http://localhost:3000/rejectFriendRequest?friendId="+friendId,{"token":this.token}).subscribe((resp) => {
+      if(resp.body.message && resp.body.friendRequests) {
+        this.menuData.friendRequests = resp.body.friendRequests;
+        this.popupData.friendRequests = resp.body.friendRequests;
+      } else if(resp.body.message){
+        alert(resp.body.message);
+      }
+    });
   }
 
   deleteNotification(notification:String) {
@@ -97,7 +112,14 @@ export class AppComponent {
   }
 
   unfriend(friendId:any) {
-
+    this.apiCallService.getData("http://localhost:3000/unFriend?friendId="+friendId,{"token":this.token}).subscribe((resp) => {
+      if(resp.body.message && resp.body.friends) {
+        this.menuData.friendRequests = resp.body.friends;
+        this.popupData.friends = resp.body.friends;
+      } else if(resp.body.message){
+        alert(resp.body.message);
+      }
+    });
   }
 
   login() {

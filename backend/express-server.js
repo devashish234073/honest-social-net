@@ -220,12 +220,18 @@ app.get('/rejectFriendRequest', (req, res) => {
     res.send(JSON.stringify(resp));
 });
 
-app.get('/removeFriend', (req, res) => {
+app.get('/unFriend', (req, res) => {
     let userId = setToken(req, res);
     let user = userData[userId];
+    const friendId = req.query.friendId;
+    let friend = userData[friendId];
     let resp = {};
-    if(user) {
-
+    if(user && friend) {
+        if(friend.friends.indexOf(userId)>-1 && user.friends.indexOf(friendId)>-1) {
+            friend.friends.splice(friend.friends.indexOf(userId),1);
+            user.friends.splice(user.friends.indexOf(friendId),1);
+            resp = {"message":"Success","friends":user.friends};
+        }
     } else {
         resp = {"message":"Invalid Session"};
     }
