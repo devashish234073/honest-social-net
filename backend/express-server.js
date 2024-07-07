@@ -141,9 +141,9 @@ app.get('/getUserData', (req, res) => {
     let user = userData[userId];
     let obj = {"friendRequests":[],"notifications":[],"friends":[]};
     if(user) {
-        obj["friendRequests"] = user.friendRequests;
-        obj["notifications"] = user.notifications;
-        obj["friends"] = user.friends; 
+        obj["friendRequests"] = user.friendRequests?reverseArray(user.friendRequests):user.friendRequests;
+        obj["notifications"] = user.notifications?reverseArray(user.notifications):user.notifications;
+        obj["friends"] = user.friends?reverseArray(user.friends):user.friends; 
     }
     res.send(JSON.stringify(obj));
 });
@@ -194,7 +194,7 @@ app.get('/acceptFriendRequest', (req, res) => {
             user.friends.push(friendId);
             friend.friends.push(userId);
             friend.notifications.push(`@${userId} accepted your friend request.`);
-            resp = {"message":"Friend Request Accepted","friendRequests":user.friendRequests,"friends":user.friends};
+            resp = {"message":"Friend Request Accepted","friendRequests":user.friendRequests?reverseArray(user.friendRequests):user.friendRequests,"friends":user.friends?user.friends.reverse:user.friends};
         }
     } else {
         resp = {"message":"Invalid Session"};
@@ -212,7 +212,7 @@ app.get('/rejectFriendRequest', (req, res) => {
             resp = {"message":"Invalid State. There is no such friend request"};
         } else {
             user.friendRequests.splice(user.friendRequests.indexOf(friendId),1);//remove friend request
-            resp = {"message":"Friend Request Rejected","friendRequests":user.friendRequests};
+            resp = {"message":"Friend Request Rejected","friendRequests":user.friendRequests?reverseArray(user.friendRequests):user.friendRequests};
         }
     } else {
         resp = {"message":"Invalid Session"};
@@ -241,9 +241,11 @@ app.get('/unFriend', (req, res) => {
 app.get('/deleteNotification', (req, res) => {
     let userId = setToken(req, res);
     let user = userData[userId];
+    const notification = req.query.notification;
     let resp = {};
-    if(user) {
-
+    if(user && notification && user.notifications && user.notifications.indexOf(notification)>-1) {
+        user.notifications.splice(user.notifications.indexOf(notification),1);
+        resp = {"message":"Success","notifications":user.notifications?reverseArray(user.notifications):user.notifications};
     } else {
         resp = {"message":"Invalid Session"};
     }
@@ -319,6 +321,12 @@ function signUpIfNewUser(userId) {
     if (!userData[userId]) {
         userData[userId] = { "id": userId, "friendRequests": [], "friends": [], "posts": [], "friendsPosts": [], "notifications": [] };
     }
+}
+
+function reverseArray(originalArray) {
+    const copiedArray = originalArray.slice();
+    const reversedArray = copiedArray.reverse();
+    return reversedArray;
 }
 
 function setToken(req, res, userId) {

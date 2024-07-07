@@ -52,9 +52,6 @@ export class AppComponent {
     this.apiCallService.getData("http://localhost:3000/getUserData",{"token":this.token}).subscribe((resp) => {
       console.log("menu data",resp.body);
       this.menuData = resp.body;
-      if(this.menuData && this.menuData.notifications) {
-        this.menuData.notifications.reverse();//sort with lastest notification up
-      }
     });
   }
 
@@ -108,7 +105,14 @@ export class AppComponent {
   }
 
   deleteNotification(notification:String) {
-
+    this.apiCallService.getData("http://localhost:3000/deleteNotification?notification="+notification,{"token":this.token}).subscribe((resp) => {
+      if(resp.body.message && resp.body.notifications) {
+        this.menuData.notifications = resp.body.notifications;
+        this.popupData.notifications = resp.body.notifications;
+      } else if(resp.body.message){
+        alert(resp.body.message);
+      }
+    });
   }
 
   unfriend(friendId:any) {
