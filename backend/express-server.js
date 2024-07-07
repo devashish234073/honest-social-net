@@ -230,7 +230,7 @@ app.get('/unFriend', (req, res) => {
         if(friend.friends.indexOf(userId)>-1 && user.friends.indexOf(friendId)>-1) {
             friend.friends.splice(friend.friends.indexOf(userId),1);
             user.friends.splice(user.friends.indexOf(friendId),1);
-            resp = {"message":"Success","friends":user.friends};
+            resp = {"message":"Success","friends":reverseArray(user.friends)};
         }
     } else {
         resp = {"message":"Invalid Session"};
