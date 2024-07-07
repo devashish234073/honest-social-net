@@ -138,7 +138,6 @@ app.get('/searchUser', (req, res) => {
 
 app.get('/getUserData', (req, res) => {
     let userId = setToken(req, res);
-    console.log("getting user with id",userId);
     let user = userData[userId];
     let obj = {"friendRequests":[],"notifications":[],"friends":[]};
     if(user) {
@@ -150,7 +149,99 @@ app.get('/getUserData', (req, res) => {
 });
 
 app.get('/sendFriendRequest', (req, res) => {
+    let userId = setToken(req, res);
+    let user = userData[userId];
+    const friendId = req.query.friendId;
+    let resp = {};
+    let friend = userData[friendId];
+    if(user && friend && friendId!=userId) {
+        if(!friend.friendRequests) {
+            friend.friendRequests = [];
+        }
+        if(!user.friendRequests && user.friendRequests.indexOf(friendId)>-1) {
+            resp = {"message":"You already have a friend request from "+friendId};
+        } else if(friend.friendRequests.indexOf(userId)==-1) {
+            friend.friendRequests.push(userId);
+            friend.notifications.push("You have one friend request from @"+userId);
+            resp = {"message":"Friend Request Sent"};
+        } else {
+            resp = {"message":"Friend Request Already Sent Before"};
+        }
+    } else {
+        resp = {"message":"Invalid Session"};
+    }
+    res.send(JSON.stringify(resp));
+});
 
+app.get('/acceptFriendRequest', (req, res) => {
+    let userId = setToken(req, res);
+    let user = userData[userId];
+    const friendId = req.query.friendId;
+    let friend = userData[friendId];
+    let resp = {};
+    if(user && friend) {
+        if(!user.friendRequests || user.friendRequests.indexOf(friendId)==-1) {
+            resp = {"message":"Invalid State. There is no such friend request"};
+        } else {
+            if(!user.friends) {
+                user.friends = [];
+            }
+            if(!friend.friends) {
+                friend.friends = [];
+            }
+            user.friendRequests.splice(user.friendRequests.indexOf(friendId),1);//remove friend request
+            //make both friends of each other
+            user.friends.push(friendId);
+            friend.friends.push(userId);
+            friend.notifications.push(`@${userId} accepted your friend request.`);
+            resp = {"message":"Friend Request Accepted","friendRequests":user.friendRequests,"friends":user.friends};
+        }
+    } else {
+        resp = {"message":"Invalid Session"};
+    }
+    res.send(JSON.stringify(resp));
+});
+
+app.get('/rejectFriendRequest', (req, res) => {
+    let userId = setToken(req, res);
+    let user = userData[userId];
+    const friendId = req.query.friendId;
+    let resp = {};
+    if(user) {
+        if(!user.friendRequests || user.friendRequests.indexOf(friendId)==-1) {
+            resp = {"message":"Invalid State. There is no such friend request"};
+        } else {
+            user.friendRequests.splice(user.friendRequests.indexOf(friendId),1);//remove friend request
+            resp = {"message":"Friend Request Rejected","friendRequests":user.friendRequests};
+        }
+    } else {
+        resp = {"message":"Invalid Session"};
+    }
+    res.send(JSON.stringify(resp));
+});
+
+app.get('/removeFriend', (req, res) => {
+    let userId = setToken(req, res);
+    let user = userData[userId];
+    let resp = {};
+    if(user) {
+
+    } else {
+        resp = {"message":"Invalid Session"};
+    }
+    res.send(JSON.stringify(resp));
+});
+
+app.get('/deleteNotification', (req, res) => {
+    let userId = setToken(req, res);
+    let user = userData[userId];
+    let resp = {};
+    if(user) {
+
+    } else {
+        resp = {"message":"Invalid Session"};
+    }
+    res.send(JSON.stringify(resp));
 });
 
 app.get('/getAllPosts', (req, res) => {
