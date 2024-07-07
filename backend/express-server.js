@@ -194,7 +194,7 @@ app.get('/acceptFriendRequest', (req, res) => {
             user.friends.push(friendId);
             friend.friends.push(userId);
             friend.notifications.push(`@${userId} accepted your friend request.`);
-            resp = {"message":"Friend Request Accepted","friendRequests":user.friendRequests?reverseArray(user.friendRequests):user.friendRequests,"friends":user.friends?user.friends.reverse:user.friends};
+            resp = {"message":"Friend Request Accepted","friendRequests":user.friendRequests?reverseArray(user.friendRequests):user.friendRequests,"friends":user.friends?reverseArray(user.friends):user.friends};
         }
     } else {
         resp = {"message":"Invalid Session"};
