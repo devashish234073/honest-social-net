@@ -52,6 +52,9 @@ export class AppComponent {
     this.apiCallService.getData("http://localhost:3000/getUserData",{"token":this.token}).subscribe((resp) => {
       console.log("menu data",resp.body);
       this.menuData = resp.body;
+      if(this.menuData && this.menuData.notifications) {
+        this.menuData.notifications.reverse();//sort with lastest notification up
+      }
     });
   }
 
@@ -81,15 +84,15 @@ export class AppComponent {
     this.popupData = {"friendRequests":[],"notifications":[],"friends":[]};
   }
 
-  acceptFriendRequest(request:any) {
+  acceptFriendRequest(friendId:any) {
+
+  }
+
+  rejectFriendRequest(friendId:any) {
 
   }
 
   deleteNotification(notification:String) {
-
-  }
-
-  rejectFriendRequest(request:any) {
 
   }
 

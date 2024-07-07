@@ -225,7 +225,7 @@
         <div class="menu-content">
             <a (click)="openFriendReqDialog()">Friend Requests<div class="count-circle" *ngIf="menuData.friendRequests && menuData.friendRequests.length>0">{{menuData.friendRequests.length}}</div></a>
             <a (click)="openNotificationsDialog()">Notifications<div class="count-circle" *ngIf="menuData.notifications && menuData.notifications.length>0">{{menuData.notifications.length}}</div></a>
-            <a (click)="openFriendsDialog()">Friends<div class="count-circle" *ngIf="menuData.friends && menuData.friends.length>0">{{menuData.friends.length}}</div></a>
+            <a (click)="openFriendsDialog()">Friends<div class="count-circle-green" *ngIf="menuData.friends && menuData.friends.length>0">{{menuData.friends.length}}</div></a>
         </div>
     </div>
       <input *ngIf="!loggedIn" type="text" class="userid" placeholder="user id" #userId>
@@ -307,14 +307,13 @@
   <div class="dialog-content" *ngIf="popupData.friendRequests.length>0">
     <span class="close" (click)="closeDialog()">&times;</span>
     <h3>Friend Requests</h3>
-    <div *ngFor="let request of popupData.friendRequests" class="friend-card">
+    <div *ngFor="let friendId of popupData.friendRequests" class="friend-card">
       <div class="card-content">
-        <p>{{ request.name }}</p>
-        <p>{{ request.message }}</p>
+        <p>{{ friendId }}</p>
       </div>
       <div class="card-actions">
-        <button (click)="acceptFriendRequest(request)">Accept</button>
-        <button (click)="rejectFriendRequest(request)">Reject</button>
+        <button (click)="acceptFriendRequest(friendId)" class="dialog-button">Accept</button>
+        <button (click)="rejectFriendRequest(friendId)" class="dialog-button-red">Reject</button>
       </div>
     </div>
   </div>
@@ -326,7 +325,7 @@
         <p>{{ friendId }}</p>
       </div>
       <div class="card-actions">
-        <button (click)="unfriend(friendId)">Unfriend</button>
+        <button (click)="unfriend(friendId)" class="dialog-button-red unfriend-button">Unfriend</button>
       </div>
     </div>
   </div>

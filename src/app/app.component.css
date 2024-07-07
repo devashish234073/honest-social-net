@@ -50,6 +50,18 @@
     justify-content: center;
 }
 
+.count-circle-green {
+  width: 20px;
+  height: 20px;
+  background-color: green;
+  color: white;
+  font-size: 12px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .dialog {
     position: fixed; 
     z-index: 1;
@@ -109,7 +121,34 @@
     margin: 0;
     padding: 5px 0;
   }
+
+  .card-content {
+    margin-bottom: 10px;
+  }
   
   .card-actions button {
     margin-right: 5px;
+  }
+
+  .unfriend-button {
+    float: right;
+    margin-top: -38px;
+  }
+
+  .dialog-button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .dialog-button-red {
+    background-color: red;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
   }

@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiCallService } from '../api-call.service';
+import { CommunicationService } from '../communication.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -23,7 +24,7 @@ export class HomeComponent implements OnInit {
   @ViewChild("friendId") friendIdRef?: ElementRef;
   @ViewChild("aicheckbox") aicheckboxref?: ElementRef;
 
-  constructor(private route: ActivatedRoute, private router: Router, private apiCallService: ApiCallService) { }
+  constructor(private route: ActivatedRoute, private router: Router, private apiCallService: ApiCallService, private communicationService: CommunicationService) { }
 
   ngOnInit(): void {
     this.userId = sessionStorage.getItem("userId");
@@ -79,8 +80,10 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  sendFriendRequest() {
-    
+  sendFriendRequest(friendId:String) {
+    this.apiCallService.getData("http://localhost:3000/sendFriendRequest?friendId="+friendId,{"token":this.token}).subscribe((resp) => {
+      this.friendOutput.buttonLabel = resp.body.message;
+    });
   }
 
   toggleCheckbox() {
