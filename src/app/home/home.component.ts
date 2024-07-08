@@ -23,6 +23,8 @@ export class HomeComponent implements OnInit {
   @ViewChild("popup") popup?: ElementRef;
   @ViewChild("friendId") friendIdRef?: ElementRef;
   @ViewChild("aicheckbox") aicheckboxref?: ElementRef;
+  @ViewChild("captionField") captionFieldRef?: ElementRef;
+  @ViewChild("fileChooser") fileChooserRef?: ElementRef;
 
   constructor(private route: ActivatedRoute, private router: Router, private apiCallService: ApiCallService, private communicationService: CommunicationService) { }
 
@@ -33,12 +35,12 @@ export class HomeComponent implements OnInit {
     if (!this.userId || this.userId == '' || !this.token || this.token == '') {
       this.router.navigate(['/']);
     } else {
-      this.apiCallService.getData("http://localhost:3000/getAllPosts", { "token": this.token }).subscribe((resp) => {
+      this.apiCallService.getData(this.apiCallService.getBackendHost()+"/getAllPosts", { "token": this.token }).subscribe((resp) => {
         let postIds = resp.body;
         console.log(postIds);
         for (let postIndx = 0; postIndx < postIds.length; postIndx++) {
           let postId = postIds[postIndx];
-          this.apiCallService.getData("http://localhost:3000/getPost?postId=" + postId, { "token": this.token }).subscribe((resp) => {
+          this.apiCallService.getData(this.apiCallService.getBackendHost()+"/getPost?postId=" + postId, { "token": this.token }).subscribe((resp) => {
             let post: any = resp.body;
             let headers: any = resp.headers;
             if (post && post.postId) {
@@ -72,7 +74,7 @@ export class HomeComponent implements OnInit {
     if(!friendId || friendId=="") {
       this.friendOutput = {"error":"Enter friend id to search"};
     } else {
-      this.apiCallService.getData("http://localhost:3000/searchUser?userIdToSearch=" + friendId, { "token": this.token }).subscribe((resp) => {
+      this.apiCallService.getData(this.apiCallService.getBackendHost()+"/searchUser?userIdToSearch=" + friendId, { "token": this.token }).subscribe((resp) => {
         let respBody = resp.body;
         this.friendOutput = respBody;
         console.log("friend search result",this.friendOutput);
@@ -81,7 +83,7 @@ export class HomeComponent implements OnInit {
   }
 
   sendFriendRequest(friendId:String) {
-    this.apiCallService.getData("http://localhost:3000/sendFriendRequest?friendId="+friendId,{"token":this.token}).subscribe((resp) => {
+    this.apiCallService.getData(this.apiCallService.getBackendHost()+"/sendFriendRequest?friendId="+friendId,{"token":this.token}).subscribe((resp) => {
       this.friendOutput.buttonLabel = resp.body.message;
     });
   }
@@ -102,6 +104,24 @@ export class HomeComponent implements OnInit {
     if(this.aicheckboxref) {
       this.generateWithAI = this.aicheckboxref.nativeElement.checked;
     }
+  }
+
+  postStatus() {
+    let generateUsingAI = false;
+    if(this.aicheckboxref) {
+      generateUsingAI = this.aicheckboxref.nativeElement.checked;
+    }
+    let imageFile = '';
+    if(this.fileChooserRef) {
+      imageFile = this.fileChooserRef.nativeElement.files[0];
+    }
+    let caption = '';
+    if(this.captionFieldRef) {
+      caption = this.captionFieldRef.nativeElement.value;
+    }
+    let data = {"generateUsingAI":generateUsingAI,"imageFile":imageFile,"caption":caption};
+    console.log("posting status with data",data);
+    this.apiCallService.postStatus(imageFile,caption,generateUsingAI);
   }
 
   showPopup(event: MouseEvent, likedBy: string[]) {

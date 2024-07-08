@@ -1,10 +1,10 @@
 <div class="post">
     <div class="postHeader">Write a post</div>
-    <div class="caption"><textarea id="post-content"></textarea></div>
-    <input type="file" class="file-chooser" *ngIf="!generateWithAI">
+    <div class="caption"><textarea id="post-content" #captionField></textarea></div>
+    <input type="file" class="file-chooser" *ngIf="!generateWithAI" #fileChooser>
     <div class="actions">
         <span><input type="checkbox" (click)="setGenerateWithAI()" #aicheckbox><span (click)="toggleCheckbox()">Generate with AI</span></span>
-        <button class="comment-button">Post</button>
+        <button class="comment-button" (click)="postStatus()">Post</button>
     </div>
 </div>
 <hr>

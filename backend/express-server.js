@@ -1,6 +1,20 @@
 const express = require('express');
+let generateImageFunc = null;
+let generateImageFuncError = null;
+(async () => {
+    try {
+        const { generateImage } = await import('./AI/stability-ai.js');
+        console.log(generateImage);
+        generateImageFunc = generateImage;
+    } catch (error) {
+        console.error('Error importing AI/stability-ai:', error);
+        generateImageFuncError = error;
+    }
+})();
+console.log(generateImageFunc);
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const multer = require('multer');
 const fs = require("fs");
 const app = express();
 const port = 3000;
@@ -100,32 +114,82 @@ app.get('/checkLogin', (req, res) => {
     res.send(JSON.stringify({ "msg": 'logged in user ' + userId, "userId": userId, "loggedIn": userId == undefined ? false : true }));
 });
 
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        const uploadDir = './uploads';
+        if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir);
+        }
+        cb(null, uploadDir);
+    },
+    filename: (req, file, cb) => {
+        let originalFileNameSplit = file.originalname.split(".");
+        let newFileName = generateUUID() + "." + originalFileNameSplit[originalFileNameSplit.length - 1];
+        cb(null, `${"d-" + Date.now()}-${newFileName}`);
+    }
+});
+
+const upload = multer({ storage: storage });
+
+app.post('/postStatus', upload.single('image'), (req, res) => {
+    const token = req.body.token;
+    const userId = tokens[token];
+    if (!userId) {
+        return res.status(400).send({ "error": 'Invalid Session' });
+    } else {
+        const caption = req.body.caption;
+        const aigenerate = req.body.aigenerate === 'true';
+        const imageFile = req.file;
+
+        const postData = {
+            caption: caption,
+            userId: userId,
+            imageUrl: imageFile ? imageFile.path : null,
+            aigenerate: aigenerate,
+        };
+        let postId = generateUUID2() + "-d-" + Date.now();
+        let post = { "id": postId, "image": imageFile ? imageFile.filename : null, "caption": caption, "visibility": EVERYONE, "userId": userId, "date": (new Date()), "likes": [], "comments": [] };
+        userData[userId]["posts"].push(postId);
+        posts[postId] = post;
+        console.log("new post created by " + userId, post);
+        if (aigenerate) {
+            if (generateImageFunc) {
+                console.log("content will get generated using AI asynchronously");
+                generatePostUsingAI(caption, userId, postId);
+            }
+            res.status(200).send({ "message": 'content will get generated using AI asynchronously check after few minutes' });
+        } else {
+            res.status(200).send({ "message": 'Status update success' });
+        }
+    }
+});
+
 app.get('/searchUser', (req, res) => {
     let userId = setToken(req, res);
     const userIdToSearch = req.query.userIdToSearch;
     let obj = {};
     let userSearched = userData[userIdToSearch];
     let user = userData[userId];
-    if(userIdToSearch==userId) {
+    if (userIdToSearch == userId) {
         obj["error"] = `You can't send friend request to yourself.`;
-    } else if(userSearched) {
+    } else if (userSearched) {
         obj["userId"] = userSearched.id;
-        obj["friends"] = userSearched.friends?userSearched.friends.length:0;
-        obj["totalPosts"] = userSearched.posts?userSearched.posts.length:0;
+        obj["friends"] = userSearched.friends ? userSearched.friends.length : 0;
+        obj["totalPosts"] = userSearched.posts ? userSearched.posts.length : 0;
         obj["mutualFriends"] = [];
-        if(userSearched.friends.indexOf(userId)>-1) {
+        if (userSearched.friends.indexOf(userId) > -1) {
             obj["buttonLabel"] = "You two are already friends";
-        } else if(userSearched.friendRequests.indexOf(userId)>-1) {
+        } else if (userSearched.friendRequests.indexOf(userId) > -1) {
             obj["buttonLabel"] = "Friend Request Already Sent";
-        } else if(user.friendRequests.indexOf(userIdToSearch)>-1) {
-            obj["buttonLabel"] = "You already have a friend request from "+userIdToSearch;
+        } else if (user.friendRequests.indexOf(userIdToSearch) > -1) {
+            obj["buttonLabel"] = "You already have a friend request from " + userIdToSearch;
         } else {
             obj["buttonLabel"] = "Send Friend Request";
         }
-        if(userSearched.friends && userSearched.friends.length>0 && user.friends && user.friends.length>0) {
-            for(let friendIndx in user.friends) {
+        if (userSearched.friends && userSearched.friends.length > 0 && user.friends && user.friends.length > 0) {
+            for (let friendIndx in user.friends) {
                 let friendId = user.friends[friendIndx];
-                if(userSearched.friends.indexOf(friendId)>-1) {
+                if (userSearched.friends.indexOf(friendId) > -1) {
                     obj["mutualFriends"].push(friendId);
                 }
             }
@@ -139,11 +203,11 @@ app.get('/searchUser', (req, res) => {
 app.get('/getUserData', (req, res) => {
     let userId = setToken(req, res);
     let user = userData[userId];
-    let obj = {"friendRequests":[],"notifications":[],"friends":[]};
-    if(user) {
-        obj["friendRequests"] = user.friendRequests?reverseArray(user.friendRequests):user.friendRequests;
-        obj["notifications"] = user.notifications?reverseArray(user.notifications):user.notifications;
-        obj["friends"] = user.friends?reverseArray(user.friends):user.friends; 
+    let obj = { "friendRequests": [], "notifications": [], "friends": [] };
+    if (user) {
+        obj["friendRequests"] = user.friendRequests ? reverseArray(user.friendRequests) : user.friendRequests;
+        obj["notifications"] = user.notifications ? reverseArray(user.notifications) : user.notifications;
+        obj["friends"] = user.friends ? reverseArray(user.friends) : user.friends;
     }
     res.send(JSON.stringify(obj));
 });
@@ -154,21 +218,21 @@ app.get('/sendFriendRequest', (req, res) => {
     const friendId = req.query.friendId;
     let resp = {};
     let friend = userData[friendId];
-    if(user && friend && friendId!=userId) {
-        if(!friend.friendRequests) {
+    if (user && friend && friendId != userId) {
+        if (!friend.friendRequests) {
             friend.friendRequests = [];
         }
-        if(!user.friendRequests && user.friendRequests.indexOf(friendId)>-1) {
-            resp = {"message":"You already have a friend request from "+friendId};
-        } else if(friend.friendRequests.indexOf(userId)==-1) {
+        if (!user.friendRequests && user.friendRequests.indexOf(friendId) > -1) {
+            resp = { "message": "You already have a friend request from " + friendId };
+        } else if (friend.friendRequests.indexOf(userId) == -1) {
             friend.friendRequests.push(userId);
-            friend.notifications.push("You have one friend request from @"+userId);
-            resp = {"message":"Friend Request Sent"};
+            friend.notifications.push("You have one friend request from @" + userId);
+            resp = { "message": "Friend Request Sent" };
         } else {
-            resp = {"message":"Friend Request Already Sent Before"};
+            resp = { "message": "Friend Request Already Sent Before" };
         }
     } else {
-        resp = {"message":"Invalid Session"};
+        resp = { "message": "Invalid Session" };
     }
     res.send(JSON.stringify(resp));
 });
@@ -179,25 +243,25 @@ app.get('/acceptFriendRequest', (req, res) => {
     const friendId = req.query.friendId;
     let friend = userData[friendId];
     let resp = {};
-    if(user && friend) {
-        if(!user.friendRequests || user.friendRequests.indexOf(friendId)==-1) {
-            resp = {"message":"Invalid State. There is no such friend request"};
+    if (user && friend) {
+        if (!user.friendRequests || user.friendRequests.indexOf(friendId) == -1) {
+            resp = { "message": "Invalid State. There is no such friend request" };
         } else {
-            if(!user.friends) {
+            if (!user.friends) {
                 user.friends = [];
             }
-            if(!friend.friends) {
+            if (!friend.friends) {
                 friend.friends = [];
             }
-            user.friendRequests.splice(user.friendRequests.indexOf(friendId),1);//remove friend request
+            user.friendRequests.splice(user.friendRequests.indexOf(friendId), 1);//remove friend request
             //make both friends of each other
             user.friends.push(friendId);
             friend.friends.push(userId);
             friend.notifications.push(`@${userId} accepted your friend request.`);
-            resp = {"message":"Friend Request Accepted","friendRequests":user.friendRequests?reverseArray(user.friendRequests):user.friendRequests,"friends":user.friends?reverseArray(user.friends):user.friends};
+            resp = { "message": "Friend Request Accepted", "friendRequests": user.friendRequests ? reverseArray(user.friendRequests) : user.friendRequests, "friends": user.friends ? reverseArray(user.friends) : user.friends };
         }
     } else {
-        resp = {"message":"Invalid Session"};
+        resp = { "message": "Invalid Session" };
     }
     res.send(JSON.stringify(resp));
 });
@@ -207,15 +271,15 @@ app.get('/rejectFriendRequest', (req, res) => {
     let user = userData[userId];
     const friendId = req.query.friendId;
     let resp = {};
-    if(user) {
-        if(!user.friendRequests || user.friendRequests.indexOf(friendId)==-1) {
-            resp = {"message":"Invalid State. There is no such friend request"};
+    if (user) {
+        if (!user.friendRequests || user.friendRequests.indexOf(friendId) == -1) {
+            resp = { "message": "Invalid State. There is no such friend request" };
         } else {
-            user.friendRequests.splice(user.friendRequests.indexOf(friendId),1);//remove friend request
-            resp = {"message":"Friend Request Rejected","friendRequests":user.friendRequests?reverseArray(user.friendRequests):user.friendRequests};
+            user.friendRequests.splice(user.friendRequests.indexOf(friendId), 1);//remove friend request
+            resp = { "message": "Friend Request Rejected", "friendRequests": user.friendRequests ? reverseArray(user.friendRequests) : user.friendRequests };
         }
     } else {
-        resp = {"message":"Invalid Session"};
+        resp = { "message": "Invalid Session" };
     }
     res.send(JSON.stringify(resp));
 });
@@ -226,14 +290,14 @@ app.get('/unFriend', (req, res) => {
     const friendId = req.query.friendId;
     let friend = userData[friendId];
     let resp = {};
-    if(user && friend) {
-        if(friend.friends.indexOf(userId)>-1 && user.friends.indexOf(friendId)>-1) {
-            friend.friends.splice(friend.friends.indexOf(userId),1);
-            user.friends.splice(user.friends.indexOf(friendId),1);
-            resp = {"message":"Success","friends":reverseArray(user.friends)};
+    if (user && friend) {
+        if (friend.friends.indexOf(userId) > -1 && user.friends.indexOf(friendId) > -1) {
+            friend.friends.splice(friend.friends.indexOf(userId), 1);
+            user.friends.splice(user.friends.indexOf(friendId), 1);
+            resp = { "message": "Success", "friends": reverseArray(user.friends) };
         }
     } else {
-        resp = {"message":"Invalid Session"};
+        resp = { "message": "Invalid Session" };
     }
     res.send(JSON.stringify(resp));
 });
@@ -243,11 +307,11 @@ app.get('/deleteNotification', (req, res) => {
     let user = userData[userId];
     const notification = req.query.notification;
     let resp = {};
-    if(user && notification && user.notifications && user.notifications.indexOf(notification)>-1) {
-        user.notifications.splice(user.notifications.indexOf(notification),1);
-        resp = {"message":"Success","notifications":user.notifications?reverseArray(user.notifications):user.notifications};
+    if (user && notification && user.notifications && user.notifications.indexOf(notification) > -1) {
+        user.notifications.splice(user.notifications.indexOf(notification), 1);
+        resp = { "message": "Success", "notifications": user.notifications ? reverseArray(user.notifications) : user.notifications };
     } else {
-        resp = {"message":"Invalid Session"};
+        resp = { "message": "Invalid Session" };
     }
     res.send(JSON.stringify(resp));
 });
@@ -259,12 +323,12 @@ app.get('/getAllPosts', (req, res) => {
         res.send("[]");
     } else {
         let posts = userData[userId]["posts"];
-        if(userData[userId]["friends"] && userData[userId]["friends"].length>0) {
-            for(let fIndx in userData[userId]["friends"]) {
+        if (userData[userId]["friends"] && userData[userId]["friends"].length > 0) {
+            for (let fIndx in userData[userId]["friends"]) {
                 let friendId = userData[userId]["friends"][fIndx];
                 let friend = userData[friendId];
-                if(friend && friend["posts"] && friend["posts"].length>0) {
-                    posts = [...posts,...friend["posts"]];
+                if (friend && friend["posts"] && friend["posts"].length > 0) {
+                    posts = [...posts, ...friend["posts"]];
                 }
             }
         }
@@ -276,9 +340,9 @@ app.get('/getPost', (req, res) => {
     let userId = setToken(req, res);
     let postId = req.query.postId;
     let post = posts[postId];
-    if(userData[userId] && post) {
-        let isSelfPost = (userData[userId]["posts"].indexOf(postId) > -1 && post.userId==userId);
-        let isFriendsPost = (userData[userId]["friends"] && userData[userId]["friends"].indexOf(post.userId)>-1);
+    if (userData[userId] && post) {
+        let isSelfPost = (userData[userId]["posts"].indexOf(postId) > -1 && post.userId == userId);
+        let isFriendsPost = (userData[userId]["friends"] && userData[userId]["friends"].indexOf(post.userId) > -1);
         if (isSelfPost || isFriendsPost) {
             let image = post.image;
             let likes = JSON.stringify(post["likes"] ? post["likes"] : []);
@@ -288,7 +352,7 @@ app.get('/getPost', (req, res) => {
                         res.status(500).send('Error reading the image file');
                     } else {
                         res.writeHead(200, { 'Content-Type': 'application/json' });
-                        let imgData = { "postId":postId,"userId":post.userId,"imgData": data ,'caption': post.caption, 'date': post.date, 'likes': likes, 'comments': JSON.stringify(post.comments) };
+                        let imgData = { "postId": postId, "userId": post.userId, "imgData": data, 'caption': post.caption, 'date': post.date, 'likes': likes, 'comments': JSON.stringify(post.comments) };
                         res.end(JSON.stringify(imgData));
                     }
                 });
@@ -296,10 +360,10 @@ app.get('/getPost', (req, res) => {
                 let captionObj = {};
                 if (image != null && image.indexOf("http") == 0) {
                     res.writeHead(200, { 'Content-Type': 'application/json' });
-                    captionObj = {"postId":postId,"userId":post.userId,"caption": post.caption , 'imageUrl': image, 'date': post.date, 'likes': likes, 'comments': JSON.stringify(post.comments)};
+                    captionObj = { "postId": postId, "userId": post.userId, "caption": post.caption, 'imageUrl': image, 'date': post.date, 'likes': likes, 'comments': JSON.stringify(post.comments) };
                 } else {
                     res.writeHead(200, { 'Content-Type': 'application/json' });
-                    captionObj = {"postId":postId,"userId":post.userId,"caption": post.caption, 'date': post.date, 'likes': likes, 'comments': JSON.stringify(post.comments) };
+                    captionObj = { "postId": postId, "userId": post.userId, "caption": post.caption, 'date': post.date, 'likes': likes, 'comments': JSON.stringify(post.comments) };
                 }
                 res.end(JSON.stringify(captionObj));
             }
@@ -316,6 +380,18 @@ app.listen(port, () => {
 });
 
 //functions
+
+async function generatePostUsingAI(caption, userId, postId) {
+    generateImageFunc(caption).then((result) => {
+        console.log("image properly generated using AI", result);
+        if (result && typeof result == 'object' && result.length > 0) {
+            posts[postId]["image"] = result[0];
+        }
+    })
+        .catch((error) => {
+            console.log("error generating AI image", error);
+        });
+}
 
 function signUpIfNewUser(userId) {
     if (!userData[userId]) {
