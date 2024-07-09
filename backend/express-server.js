@@ -212,6 +212,72 @@ app.get('/getUserData', (req, res) => {
     res.send(JSON.stringify(obj));
 });
 
+app.get('/likeOrUnlikePost', (req, res) => {
+    let userId = setToken(req, res);
+    let user = userData[userId];
+    const postId = req.query.postId;
+    let post = posts[postId];
+    let obj = { "likes": [] };
+    if (user && post) {
+        if(!post.likes) {
+            post["likes"] = [];
+        }
+        let likedNotification = userId+" liked your post "+post.id;
+        let unlikedNotification = userId+" un-liked your post "+post.id;
+        let currentNotification = '';
+        if(post["likes"].indexOf(userId)==-1) {
+            post["likes"].push(userId);
+            currentNotification = likedNotification;
+        } else {
+            post["likes"].splice(post["likes"].indexOf(userId),1);
+            currentNotification = unlikedNotification;
+        }
+        if(post.userId!=userId) {
+            let friend = userData[post.userId];
+            if(friend) {
+                if(!friend.notifications) {
+                    friend.notifications = [];
+                }
+                if(friend.notifications.indexOf(likedNotification)>-1) {
+                    friend.notifications.splice(friend.notifications.indexOf(likedNotification),1);
+                }
+                if(friend.notifications.indexOf(unlikedNotification)>-1) {
+                    friend.notifications.splice(friend.notifications.indexOf(unlikedNotification),1);
+                }
+                friend.notifications.push(currentNotification);
+            }
+        }
+        obj["likes"] = post["likes"];
+    }
+    res.send(JSON.stringify(obj));
+});
+
+app.get('/commentOnPost', (req, res) => {
+    let userId = setToken(req, res);
+    let user = userData[userId];
+    const postId = req.query.postId;
+    const comment = req.query.comment;
+    let post = posts[postId];
+    let obj = { "comments": [] };
+    if (user && comment && comment.trim()!='' && post) {
+        if(!post.comments) {
+            post["comments"] = [];
+        }
+        post["comments"].push({"comment":comment.trim(),"date":(new Date()),"user":userId});
+        if(post.userId!=userId) {
+            let friend = userData[post.userId];
+            if(friend) {
+                if(!friend.notifications) {
+                    friend.notifications = [];
+                }
+                friend.notifications.push(userId+" commented on your post "+postId);
+            }
+        }
+        obj["comments"] = post["comments"];
+    }
+    res.send(JSON.stringify(obj));
+});
+
 app.get('/sendFriendRequest', (req, res) => {
     let userId = setToken(req, res);
     let user = userData[userId];

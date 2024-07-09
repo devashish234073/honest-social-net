@@ -20,6 +20,7 @@ export class HomeComponent implements OnInit {
   generateWithAI = false;
   likesToShow: String[] = [];
   friendOutput:any = {};
+  hideTimer:any = null;
   @ViewChild("popup") popup?: ElementRef;
   @ViewChild("friendId") friendIdRef?: ElementRef;
   @ViewChild("aicheckbox") aicheckboxref?: ElementRef;
@@ -66,6 +67,22 @@ export class HomeComponent implements OnInit {
           });
         }
       });
+    }
+  }
+
+  likeOrUnlikePost(post:any) {
+    this.apiCallService.getData(this.apiCallService.getBackendHost()+"/likeOrUnlikePost?postId="+post.postId, { "token": this.token }).subscribe((resp) => {
+      post.likes = resp.body.likes;
+    });
+  }
+
+  commentOnPost(post:any,comment:any) {
+    if(comment && comment.value) {
+      this.apiCallService.getData(this.apiCallService.getBackendHost()+"/commentOnPost?postId="+post.postId+"&comment="+comment.value, { "token": this.token }).subscribe((resp) => {
+        post.comments = resp.body.comments;
+      });
+    } else {
+      alert("Please enter comment first..");
     }
   }
 
@@ -125,6 +142,10 @@ export class HomeComponent implements OnInit {
   }
 
   showPopup(event: MouseEvent, likedBy: string[]) {
+    if(this.hideTimer) {
+      clearTimeout(this.hideTimer);
+      this.hideTimer = null;
+    }
     this.popupVisible = true;
     this.likesToShow = likedBy;
     let top = `${event.clientY + 90}px`;
@@ -135,8 +156,10 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  closePopup() {
-    this.popupVisible = false;
+  closePopup(event: MouseEvent) {
+    this.hideTimer = setTimeout(()=>{
+      this.popupVisible = false;
+    },100);
   }
 
   getLikesToShow() {

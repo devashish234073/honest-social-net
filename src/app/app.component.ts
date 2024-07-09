@@ -150,4 +150,26 @@ export class AppComponent {
       });
     }
   }
+
+  fromNotificationGOToPost(notification:string) {
+    let notificationSplit = notification.split(" ");
+    if(notificationSplit.indexOf("post")>-1 && notificationSplit.indexOf("post")+1<notificationSplit.length) {
+      let postId = notificationSplit[notificationSplit.indexOf("post")+1];
+      if(postId.indexOf("-")>-1) {
+        let postIdSplit = postId.split("-");
+        if(postIdSplit.length==4) {
+          const postElement: any = document.querySelector("#post" + postId);
+          console.log("postElement",postElement);
+          if(postElement) {
+            this.popupData.notifications = [];
+            postElement.scrollIntoView({ behavior: 'smooth', inline: 'start' });
+            postElement.style.boxShadow = "3px 3px 7px cyan";
+            setTimeout(()=>{
+              postElement.style.boxShadow = "none";
+            },2000);
+          }
+        }
+      }
+    }
+  }
 }

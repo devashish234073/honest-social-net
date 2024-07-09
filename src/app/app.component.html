@@ -334,7 +334,7 @@
     <h3>Notifications</h3>
     <div *ngFor="let notification of popupData.notifications" class="friend-card">
       <div class="card-content">
-        <p>{{ notification }}</p><span class="close close-notification" (click)="deleteNotification(notification)">&times;</span>
+        <p (click)="fromNotificationGOToPost(notification)">{{ notification }}</p><span class="close close-notification" (click)="deleteNotification(notification)">&times;</span>
       </div>
     </div>
   </div>
