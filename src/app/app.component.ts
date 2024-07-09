@@ -157,7 +157,7 @@ export class AppComponent {
       let postId = notificationSplit[notificationSplit.indexOf("post")+1];
       if(postId.indexOf("-")>-1) {
         let postIdSplit = postId.split("-");
-        if(postIdSplit.length==4) {
+        if(postIdSplit.length==4 || postIdSplit.length==6) {
           const postElement: any = document.querySelector("#post" + postId);
           console.log("postElement",postElement);
           if(postElement) {

@@ -80,6 +80,7 @@ export class HomeComponent implements OnInit {
     if(comment && comment.value) {
       this.apiCallService.getData(this.apiCallService.getBackendHost()+"/commentOnPost?postId="+post.postId+"&comment="+comment.value, { "token": this.token }).subscribe((resp) => {
         post.comments = resp.body.comments;
+        comment.value = "";
       });
     } else {
       alert("Please enter comment first..");
