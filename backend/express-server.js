@@ -32,42 +32,81 @@ let watsonConfig = null;
 let watsonConfigLocal = null;
 try {
     watsonConfig = require("./watson-config.json");
-} catch(e) {
+} catch (e) {
 
 }
 try {
     watsonConfigLocal = require("./watson-config.local.json");
-} catch(e) {
-    
+} catch (e) {
+
 }
 
 let ibmConfig = null;
-if(!watsonConfigLocal && watsonConfig) {
+if (!watsonConfigLocal && watsonConfig) {
     ibmConfig = watsonConfig;
-} else if(watsonConfigLocal){
+} else if (watsonConfigLocal) {
     ibmConfig = watsonConfigLocal;
 }
-if(ibmConfig) {
+let tokenRenewalTimer = null;
+let TOKEN_CHECK_DELAY = 200000;
+if (ibmConfig) {
     //console.log(ibmConfig);
-    let tokenPromise = generateWatsonXToken();
-    tokenPromise.then((resp)=>{
-        //console.log("resp",resp);
-        ibmConfig["token"] = resp.access_token;
-        if(ibmConfig["token"]) {
-            sendPromptToWatsonX("write a poem on water").then((promptResp)=>{
+    if (!ibmConfig["tokenResp"]) {
+        let tokenPromise = generateWatsonXToken();
+        tokenPromise.then((resp) => {
+            //console.log("resp",resp);
+            ibmConfig["tokenResp"] = resp;
+            fs.writeFileSync("watson-config.local.json", JSON.stringify(ibmConfig, null, 4));
+            if (ibmConfig["token"]) {
+                sendPromptToWatsonX("write a poem on water").then((promptResp) => {
+                    console.log(promptResp);
+                });
+            }
+        });
+    } else {
+        regenerateTokenIfExpired(()=>{
+            sendPromptToWatsonX("write a poem on water").then((promptResp) => {
                 console.log(promptResp);
             });
+        })();
+    }
+    tokenRenewalTimer = setInterval(regenerateTokenIfExpired(null), TOKEN_CHECK_DELAY);
+}
+
+function regenerateTokenIfExpired(callback) {
+    return function () {
+        let expiration = ibmConfig["tokenResp"]["expiration"];
+        let expiryTime = new Date(expiration * 1000);
+        if ((expiryTime - (new Date())) < TOKEN_CHECK_DELAY) {
+            console.log("token is going to expire/expired. Renewing.....");
+            let tokenPromise = generateWatsonXToken();
+            tokenPromise.then((resp) => {
+                //console.log("resp",resp);
+                ibmConfig["tokenResp"] = resp;
+                fs.writeFileSync("watson-config.local.json", JSON.stringify(ibmConfig, null, 4));
+                console.log("token renewed");
+                if(callback) {
+                    console.log("using regenerated token");
+                    callback();
+                }
+            });
+        } else {
+            console.log("Token valid till " + expiryTime);
+            if(callback) {
+                console.log("using cached token");
+                callback();
+            }
         }
-    });
+    }
 }
 
 function getToken() {
-    return ibmConfig["token"];
+    return ibmConfig["tokenResp"]["access_token"];
 }
 
 async function generateWatsonXToken() {
-    return new Promise((resolve)=>{
-        let reqBody = ibmConfig.TOKEN_BODY+ibmConfig.IBM_CLOUD_API_KEY;
+    return new Promise((resolve) => {
+        let reqBody = ibmConfig.TOKEN_BODY + ibmConfig.IBM_CLOUD_API_KEY;
         console.log(reqBody);
         try {
             axios.post(
@@ -78,7 +117,7 @@ async function generateWatsonXToken() {
                         'Content-Type': 'application/x-www-form-urlencoded',
                     }
                 }
-            ).then((response)=>{
+            ).then((response) => {
                 resolve(response.data);
             });
         } catch (error) {
@@ -88,12 +127,12 @@ async function generateWatsonXToken() {
 }
 
 async function sendPromptToWatsonX(prompt) {
-    return new Promise((resolve)=>{
+    return new Promise((resolve) => {
         let reqBody = {
-            "input":prompt,
-            "parameters":ibmConfig.parameters,
-            "model_id":ibmConfig.WATSON_API_MODEL,
-            "project_id":ibmConfig.IBM_CLOUD_PROJECT_ID
+            "input": prompt,
+            "parameters": ibmConfig.parameters,
+            "model_id": ibmConfig.WATSON_API_MODEL,
+            "project_id": ibmConfig.IBM_CLOUD_PROJECT_ID
         };
         console.log(reqBody);
         try {
@@ -102,11 +141,11 @@ async function sendPromptToWatsonX(prompt) {
                 reqBody,
                 {
                     headers: {
-                        'Authorization':"Bearer "+getToken(),
+                        'Authorization': "Bearer " + getToken(),
                         'Content-Type': 'application/json'
                     }
                 }
-            ).then((response)=>{
+            ).then((response) => {
                 resolve(response.data);
             });
         } catch (error) {
@@ -195,6 +234,12 @@ app.get('/login/:userId', (req, res) => {
     signUpIfNewUser(userId);
     let token = setToken(req, res, userId);
     res.send(JSON.stringify({ "msg": 'logged in user ' + userId, "userId": userId, "loggedIn": userId == undefined ? false : true, "token": token }));
+});
+
+app.get('checkGrammer',async (req,res)=> {
+    const caption = req.query.caption;
+    let promptResp = await sendPromptToWatsonX("fix the graammer of this text '"+caption+"' reply only the correction do not provide any explanation just the corrected text");
+    res.end(promptResp);
 });
 
 app.get('/checkLogin', (req, res) => {
@@ -307,30 +352,30 @@ app.get('/likeOrUnlikePost', (req, res) => {
     let post = posts[postId];
     let obj = { "likes": [] };
     if (user && post) {
-        if(!post.likes) {
+        if (!post.likes) {
             post["likes"] = [];
         }
-        let likedNotification = userId+" liked your post "+post.id;
-        let unlikedNotification = userId+" un-liked your post "+post.id;
+        let likedNotification = userId + " liked your post " + post.id;
+        let unlikedNotification = userId + " un-liked your post " + post.id;
         let currentNotification = '';
-        if(post["likes"].indexOf(userId)==-1) {
+        if (post["likes"].indexOf(userId) == -1) {
             post["likes"].push(userId);
             currentNotification = likedNotification;
         } else {
-            post["likes"].splice(post["likes"].indexOf(userId),1);
+            post["likes"].splice(post["likes"].indexOf(userId), 1);
             currentNotification = unlikedNotification;
         }
-        if(post.userId!=userId) {
+        if (post.userId != userId) {
             let friend = userData[post.userId];
-            if(friend) {
-                if(!friend.notifications) {
+            if (friend) {
+                if (!friend.notifications) {
                     friend.notifications = [];
                 }
-                if(friend.notifications.indexOf(likedNotification)>-1) {
-                    friend.notifications.splice(friend.notifications.indexOf(likedNotification),1);
+                if (friend.notifications.indexOf(likedNotification) > -1) {
+                    friend.notifications.splice(friend.notifications.indexOf(likedNotification), 1);
                 }
-                if(friend.notifications.indexOf(unlikedNotification)>-1) {
-                    friend.notifications.splice(friend.notifications.indexOf(unlikedNotification),1);
+                if (friend.notifications.indexOf(unlikedNotification) > -1) {
+                    friend.notifications.splice(friend.notifications.indexOf(unlikedNotification), 1);
                 }
                 friend.notifications.push(currentNotification);
             }
@@ -347,18 +392,18 @@ app.get('/commentOnPost', (req, res) => {
     const comment = req.query.comment;
     let post = posts[postId];
     let obj = { "comments": [] };
-    if (user && comment && comment.trim()!='' && post) {
-        if(!post.comments) {
+    if (user && comment && comment.trim() != '' && post) {
+        if (!post.comments) {
             post["comments"] = [];
         }
-        post["comments"].push({"comment":comment.trim(),"date":(new Date()),"user":userId});
-        if(post.userId!=userId) {
+        post["comments"].push({ "comment": comment.trim(), "date": (new Date()), "user": userId });
+        if (post.userId != userId) {
             let friend = userData[post.userId];
-            if(friend) {
-                if(!friend.notifications) {
+            if (friend) {
+                if (!friend.notifications) {
                     friend.notifications = [];
                 }
-                friend.notifications.push(userId+" commented on your post "+postId);
+                friend.notifications.push(userId + " commented on your post " + postId);
             }
         }
         obj["comments"] = post["comments"];
