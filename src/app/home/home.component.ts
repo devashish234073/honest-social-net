@@ -21,6 +21,7 @@ export class HomeComponent implements OnInit {
   likesToShow: String[] = [];
   friendOutput:any = {};
   hideTimer:any = null;
+  checkGrammarLabel:string = "Check Grammar";
   @ViewChild("popup") popup?: ElementRef;
   @ViewChild("friendId") friendIdRef?: ElementRef;
   @ViewChild("aicheckbox") aicheckboxref?: ElementRef;
@@ -147,12 +148,14 @@ export class HomeComponent implements OnInit {
     if(this.captionFieldRef) {
       let postFldRef = this.captionFieldRef.nativeElement;
       caption = postFldRef.value;
+      this.checkGrammarLabel = "Checking...";
       this.apiCallService.getData(this.apiCallService.getBackendHost()+"/checkGrammar?caption="+caption,{"token":this.token}).subscribe((resp) => {
         console.log("grammar check response",resp.body);
         let decision = confirm(resp.body["value"]+"\nDo you want to replace the post caption with the grammer corrected value?");
         if(decision) {
           postFldRef.value = resp.body["value"];
         }
+        this.checkGrammarLabel = "Check Grammar";
       });
     }
   }
