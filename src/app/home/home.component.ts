@@ -142,6 +142,21 @@ export class HomeComponent implements OnInit {
     this.apiCallService.postStatus(imageFile,caption,generateUsingAI);
   }
 
+  checkGrammar() {
+    let caption = '';
+    if(this.captionFieldRef) {
+      let postFldRef = this.captionFieldRef.nativeElement;
+      caption = postFldRef.value;
+      this.apiCallService.getData(this.apiCallService.getBackendHost()+"/checkGrammar?caption="+caption,{"token":this.token}).subscribe((resp) => {
+        console.log("grammar check response",resp.body);
+        let decision = confirm(resp.body["value"]+"\nDo you want to replace the post caption with the grammer corrected value?");
+        if(decision) {
+          postFldRef.value = resp.body["value"];
+        }
+      });
+    }
+  }
+
   showPopup(event: MouseEvent, likedBy: string[]) {
     if(this.hideTimer) {
       clearTimeout(this.hideTimer);

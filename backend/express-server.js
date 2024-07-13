@@ -236,10 +236,36 @@ app.get('/login/:userId', (req, res) => {
     res.send(JSON.stringify({ "msg": 'logged in user ' + userId, "userId": userId, "loggedIn": userId == undefined ? false : true, "token": token }));
 });
 
-app.get('checkGrammer',async (req,res)=> {
-    const caption = req.query.caption;
-    let promptResp = await sendPromptToWatsonX("fix the graammer of this text '"+caption+"' reply only the correction do not provide any explanation just the corrected text");
-    res.end(promptResp);
+app.get('/checkGrammar',async (req,res)=> {
+    const caption = req.query.caption.split("%20").join(" ");
+    console.log("checking grammar for ",caption);
+    let userId = setToken(req, res);
+    if(userData[userId]) {
+        let promptResp = await sendPromptToWatsonX("fix the grammar of this text '"+caption+"' reply only the correction do not provide any explanation just the corrected text");
+        let fixed = {"value":caption};
+        console.log("promptResp",promptResp);
+        try {
+            if(promptResp.results && promptResp.results.length>0) {
+                let promptRespSplit = promptResp.results[0]["generated_text"].split("\n");
+                fixed["generated_text"] = promptResp.results[0]["generated_text"];
+                if(promptRespSplit.length>=3) {
+                    fixed["value"] = promptRespSplit[2];
+                } else {
+                    promptRespSplit = promptResp.results[0]["generated_text"].split("'");
+                    if(promptRespSplit.length>=3) {
+                        fixed["value"] = promptRespSplit[2];
+                    } else {
+                        fixed["value"] = promptResp.results[0]["generated_text"];
+                    }
+                }
+            }
+        } catch(e) {
+            console.log(e);
+        }
+        res.json(fixed);
+    } else {
+        res.json({});
+    }
 });
 
 app.get('/checkLogin', (req, res) => {
