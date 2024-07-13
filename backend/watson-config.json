@@ -1,0 +1,15 @@
+{
+    "IBM_CLOUD_API_KEY":"REPLACE_YOUR_API_KEY_HERE",
+    "IBM_CLOUD_PROJECT_ID":"provide-your-project-id-here",
+    "WATSON_API_MODEL": "meta-llama/llama-3-8b-instruct",
+    "TOKEN_GEN_URL":"https://iam.cloud.ibm.com/identity/token",
+    "PROMPT_URL":"https://us-south.ml.cloud.ibm.com/ml/v1/text/generation?version=2023-05-29",
+    "TOKEN_BODY":"grant_type=urn:ibm:params:oauth:grant-type:apikey&apikey=",
+    "parameters": {
+		"decoding_method": "greedy",
+		"max_new_tokens": 900,
+		"min_new_tokens": 0,
+		"stop_sequences": [],
+		"repetition_penalty": 1
+	}
+}

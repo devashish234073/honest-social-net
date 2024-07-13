@@ -17,6 +17,7 @@ const cors = require('cors');
 const multer = require('multer');
 const fs = require("fs");
 const app = express();
+const axios = require('axios');
 const port = 3000;
 const tokens = [];
 let userData = {};
@@ -26,6 +27,93 @@ let postsHash = null;
 const EVERYONE = "everyone";
 const PRIVATE = "private";
 const ONLYFRIENDS = "onlyfriends";
+
+let watsonConfig = null;
+let watsonConfigLocal = null;
+try {
+    watsonConfig = require("./watson-config.json");
+} catch(e) {
+
+}
+try {
+    watsonConfigLocal = require("./watson-config.local.json");
+} catch(e) {
+    
+}
+
+let ibmConfig = null;
+if(!watsonConfigLocal && watsonConfig) {
+    ibmConfig = watsonConfig;
+} else if(watsonConfigLocal){
+    ibmConfig = watsonConfigLocal;
+}
+if(ibmConfig) {
+    //console.log(ibmConfig);
+    let tokenPromise = generateWatsonXToken();
+    tokenPromise.then((resp)=>{
+        //console.log("resp",resp);
+        ibmConfig["token"] = resp.access_token;
+        if(ibmConfig["token"]) {
+            sendPromptToWatsonX("write a poem on water").then((promptResp)=>{
+                console.log(promptResp);
+            });
+        }
+    });
+}
+
+function getToken() {
+    return ibmConfig["token"];
+}
+
+async function generateWatsonXToken() {
+    return new Promise((resolve)=>{
+        let reqBody = ibmConfig.TOKEN_BODY+ibmConfig.IBM_CLOUD_API_KEY;
+        console.log(reqBody);
+        try {
+            axios.post(
+                ibmConfig.TOKEN_GEN_URL,
+                reqBody,
+                {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    }
+                }
+            ).then((response)=>{
+                resolve(response.data);
+            });
+        } catch (error) {
+            resolve(error);
+        }
+    });
+}
+
+async function sendPromptToWatsonX(prompt) {
+    return new Promise((resolve)=>{
+        let reqBody = {
+            "input":prompt,
+            "parameters":ibmConfig.parameters,
+            "model_id":ibmConfig.WATSON_API_MODEL,
+            "project_id":ibmConfig.IBM_CLOUD_PROJECT_ID
+        };
+        console.log(reqBody);
+        try {
+            axios.post(
+                ibmConfig.PROMPT_URL,
+                reqBody,
+                {
+                    headers: {
+                        'Authorization':"Bearer "+getToken(),
+                        'Content-Type': 'application/json'
+                    }
+                }
+            ).then((response)=>{
+                resolve(response.data);
+            });
+        } catch (error) {
+            resolve(error);
+        }
+    });
+}
 
 function populateData() {
     try {
