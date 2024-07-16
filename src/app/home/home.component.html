@@ -6,6 +6,11 @@
         <span><input type="checkbox" (click)="setGenerateWithAI()" #aicheckbox><span (click)="toggleCheckbox()">Generate with AI</span></span>
         <button class="comment-button" (click)="checkGrammar()" [disabled]="checkGrammarLabel!='Check Grammar'">{{checkGrammarLabel}}</button><button class="comment-button" (click)="postStatus()">Post</button>
     </div>
+    <div *ngIf="jsCode">
+        <canvas id="canvas"></canvas>
+        <div #codeBlock>
+        </div>
+    </div>
 </div>
 <hr>
 <div class="post">

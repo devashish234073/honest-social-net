@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Renderer2 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiCallService } from '../api-call.service';
 import { CommunicationService } from '../communication.service';
@@ -19,16 +19,26 @@ export class HomeComponent implements OnInit {
   popupVisible = false;
   generateWithAI = false;
   likesToShow: String[] = [];
-  friendOutput:any = {};
-  hideTimer:any = null;
-  checkGrammarLabel:string = "Check Grammar";
+  friendOutput: any = {};
+  hideTimer: any = null;
+  checkGrammarLabel: string = "Check Grammar";
   @ViewChild("popup") popup?: ElementRef;
   @ViewChild("friendId") friendIdRef?: ElementRef;
   @ViewChild("aicheckbox") aicheckboxref?: ElementRef;
   @ViewChild("captionField") captionFieldRef?: ElementRef;
   @ViewChild("fileChooser") fileChooserRef?: ElementRef;
+  @ViewChild("codeBlock") codeBlockRef?: ElementRef;
 
-  constructor(private route: ActivatedRoute, private router: Router, private apiCallService: ApiCallService, private communicationService: CommunicationService) { }
+  jsCode: string | null = null;
+
+  constructor(private route: ActivatedRoute, private renderer: Renderer2, private router: Router, private apiCallService: ApiCallService, private communicationService: CommunicationService) { }
+
+  injectJs() {
+    const script = this.renderer.createElement('script');
+    script.type = 'text/javascript';
+    script.text = this.jsCode;
+    this.renderer.appendChild(document.body, script);
+  }
 
   ngOnInit(): void {
     this.userId = sessionStorage.getItem("userId");
@@ -37,12 +47,12 @@ export class HomeComponent implements OnInit {
     if (!this.userId || this.userId == '' || !this.token || this.token == '') {
       this.router.navigate(['/']);
     } else {
-      this.apiCallService.getData(this.apiCallService.getBackendHost()+"/getAllPosts", { "token": this.token }).subscribe((resp) => {
+      this.apiCallService.getData(this.apiCallService.getBackendHost() + "/getAllPosts", { "token": this.token }).subscribe((resp) => {
         let postIds = resp.body;
         console.log(postIds);
         for (let postIndx = 0; postIndx < postIds.length; postIndx++) {
           let postId = postIds[postIndx];
-          this.apiCallService.getData(this.apiCallService.getBackendHost()+"/getPost?postId=" + postId, { "token": this.token }).subscribe((resp) => {
+          this.apiCallService.getData(this.apiCallService.getBackendHost() + "/getPost?postId=" + postId, { "token": this.token }).subscribe((resp) => {
             let post: any = resp.body;
             let headers: any = resp.headers;
             if (post && post.postId) {
@@ -63,7 +73,7 @@ export class HomeComponent implements OnInit {
               console.log("added post", post);
               this.posts.push(post);
             } else {
-              console.log("invalid post "+postId,resp);
+              console.log("invalid post " + postId, resp);
             }
           });
         }
@@ -71,15 +81,15 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  likeOrUnlikePost(post:any) {
-    this.apiCallService.getData(this.apiCallService.getBackendHost()+"/likeOrUnlikePost?postId="+post.postId, { "token": this.token }).subscribe((resp) => {
+  likeOrUnlikePost(post: any) {
+    this.apiCallService.getData(this.apiCallService.getBackendHost() + "/likeOrUnlikePost?postId=" + post.postId, { "token": this.token }).subscribe((resp) => {
       post.likes = resp.body.likes;
     });
   }
 
-  commentOnPost(post:any,comment:any) {
-    if(comment && comment.value) {
-      this.apiCallService.getData(this.apiCallService.getBackendHost()+"/commentOnPost?postId="+post.postId+"&comment="+comment.value, { "token": this.token }).subscribe((resp) => {
+  commentOnPost(post: any, comment: any) {
+    if (comment && comment.value) {
+      this.apiCallService.getData(this.apiCallService.getBackendHost() + "/commentOnPost?postId=" + post.postId + "&comment=" + comment.value, { "token": this.token }).subscribe((resp) => {
         post.comments = resp.body.comments;
         comment.value = "";
       });
@@ -90,27 +100,27 @@ export class HomeComponent implements OnInit {
 
   searchFriend() {
     let friendId = this.friendIdRef?.nativeElement.value.trim();
-    if(!friendId || friendId=="") {
-      this.friendOutput = {"error":"Enter friend id to search"};
+    if (!friendId || friendId == "") {
+      this.friendOutput = { "error": "Enter friend id to search" };
     } else {
-      this.apiCallService.getData(this.apiCallService.getBackendHost()+"/searchUser?userIdToSearch=" + friendId, { "token": this.token }).subscribe((resp) => {
+      this.apiCallService.getData(this.apiCallService.getBackendHost() + "/searchUser?userIdToSearch=" + friendId, { "token": this.token }).subscribe((resp) => {
         let respBody = resp.body;
         this.friendOutput = respBody;
-        console.log("friend search result",this.friendOutput);
+        console.log("friend search result", this.friendOutput);
       });
     }
   }
 
-  sendFriendRequest(friendId:String) {
-    this.apiCallService.getData(this.apiCallService.getBackendHost()+"/sendFriendRequest?friendId="+friendId,{"token":this.token}).subscribe((resp) => {
+  sendFriendRequest(friendId: String) {
+    this.apiCallService.getData(this.apiCallService.getBackendHost() + "/sendFriendRequest?friendId=" + friendId, { "token": this.token }).subscribe((resp) => {
       this.friendOutput.buttonLabel = resp.body.message;
     });
   }
 
   toggleCheckbox() {
-    if(this.aicheckboxref) {
+    if (this.aicheckboxref) {
       let aicheckbox = this.aicheckboxref.nativeElement;
-      if(aicheckbox.checked) {
+      if (aicheckbox.checked) {
         aicheckbox.checked = false;
       } else {
         aicheckbox.checked = true;
@@ -120,40 +130,59 @@ export class HomeComponent implements OnInit {
   }
 
   setGenerateWithAI() {
-    if(this.aicheckboxref) {
+    if (this.aicheckboxref) {
       this.generateWithAI = this.aicheckboxref.nativeElement.checked;
     }
   }
 
   postStatus() {
     let generateUsingAI = false;
-    if(this.aicheckboxref) {
+    if (this.aicheckboxref) {
       generateUsingAI = this.aicheckboxref.nativeElement.checked;
     }
     let imageFile = '';
-    if(this.fileChooserRef) {
+    if (this.fileChooserRef) {
       imageFile = this.fileChooserRef.nativeElement.files[0];
     }
     let caption = '';
-    if(this.captionFieldRef) {
+    if (this.captionFieldRef) {
       caption = this.captionFieldRef.nativeElement.value;
     }
-    let data = {"generateUsingAI":generateUsingAI,"imageFile":imageFile,"caption":caption};
-    console.log("posting status with data",data);
-    this.apiCallService.postStatus(imageFile,caption,generateUsingAI);
+    let data = { "generateUsingAI": generateUsingAI, "imageFile": imageFile, "caption": caption };
+    console.log("posting status with data", data);
+    this.apiCallService.postStatus(imageFile, caption, generateUsingAI);
+  }
+
+  processGraphResp(rawResp:string) {
+    let rawRespSplit = rawResp.split("```");
+    console.log("graph rawRespSplit",rawRespSplit);
+    for(let indx in rawRespSplit) {
+      if(rawRespSplit[indx].trim().startsWith("javascript")) {
+        console.log("graph value selected",rawRespSplit[indx].trim());
+        return rawRespSplit[indx].replace("javascript","");
+      }
+    }
+    return rawResp;
   }
 
   checkGrammar() {
     let caption = '';
-    if(this.captionFieldRef) {
+    if (this.captionFieldRef) {
       let postFldRef = this.captionFieldRef.nativeElement;
       caption = postFldRef.value;
       this.checkGrammarLabel = "Checking...";
-      this.apiCallService.getData(this.apiCallService.getBackendHost()+"/checkGrammar?caption="+caption,{"token":this.token}).subscribe((resp) => {
-        console.log("grammar check response",resp.body);
-        let decision = confirm(resp.body["value"]+"\nDo you want to replace the post caption with the grammer corrected value?");
-        if(decision) {
-          postFldRef.value = resp.body["value"];
+      this.apiCallService.getData(this.apiCallService.getBackendHost() + "/checkGrammar?caption=" + caption, { "token": this.token }).subscribe((resp) => {
+        console.log("grammar check response", resp.body);
+        if(caption.startsWith("graph:")) {
+          let rawResp = resp.body["value"];
+          let processedResp = this.processGraphResp(rawResp);
+          this.jsCode = "setTimeout(()=>{"+processedResp+"},1000);";
+          this.injectJs();
+        } else {
+          let decision = confirm(resp.body["value"] + "\nDo you want to replace the post caption with the grammer corrected value?");
+          if (decision) {
+            postFldRef.value = resp.body["value"];
+          }
         }
         this.checkGrammarLabel = "Check Grammar";
       });
@@ -161,7 +190,7 @@ export class HomeComponent implements OnInit {
   }
 
   showPopup(event: MouseEvent, likedBy: string[]) {
-    if(this.hideTimer) {
+    if (this.hideTimer) {
       clearTimeout(this.hideTimer);
       this.hideTimer = null;
     }
@@ -176,9 +205,9 @@ export class HomeComponent implements OnInit {
   }
 
   closePopup(event: MouseEvent) {
-    this.hideTimer = setTimeout(()=>{
+    this.hideTimer = setTimeout(() => {
       this.popupVisible = false;
-    },100);
+    }, 100);
   }
 
   getLikesToShow() {

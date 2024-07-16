@@ -52,52 +52,52 @@ if (ibmConfig) {
     //console.log(ibmConfig);
     if (!ibmConfig["tokenResp"]) {
         let tokenPromise = generateWatsonXToken();
-        console.log("tokenPromise",tokenPromise);
+        console.log("tokenPromise", tokenPromise);
         tokenPromise.then((resp) => {
             //console.log("resp",resp);
             ibmConfig["tokenResp"] = resp;
             fs.writeFileSync("watson-config.local.json", JSON.stringify(ibmConfig, null, 4));
             if (ibmConfig["token"]) {
                 sendPromptToWatsonX("write a poem on water", 0).then((promptResp) => {
-                    console.log("promptResp",promptResp);
+                    console.log("promptResp", promptResp);
                 })
-                .catch((error) => {
-                    error.text().then(response => {
-                        const errorDetails = {
-                          status: response.status,
-                          statusText: response.statusText,
-                          body: response
-                        };
-                        console.log("error while genetating token ",errorDetails);
+                    .catch((error) => {
+                        error.text().then(response => {
+                            const errorDetails = {
+                                status: response.status,
+                                statusText: response.statusText,
+                                body: response
+                            };
+                            console.log("error while genetating token ", errorDetails);
+                        });
                     });
-                });
             }
         })
-        .catch((error)=>{
-            error.text().then(response => {
-                const errorDetails = {
-                  status: response.status,
-                  statusText: response.statusText,
-                  body: response
-                };
-                console.log("error while genetating token ",errorDetails);
-            });
-        });
-    } else {
-        regenerateTokenIfExpired(() => {
-            sendPromptToWatsonX("write a poem on water", 0).then((promptResp) => {
-                console.log("promptResp",promptResp);
-            })
             .catch((error) => {
                 error.text().then(response => {
                     const errorDetails = {
-                      status: response.status,
-                      statusText: response.statusText,
-                      body: response
+                        status: response.status,
+                        statusText: response.statusText,
+                        body: response
                     };
-                    console.log("error while genetating token ",errorDetails);
+                    console.log("error while genetating token ", errorDetails);
                 });
             });
+    } else {
+        regenerateTokenIfExpired(() => {
+            sendPromptToWatsonX("write a poem on water", 0).then((promptResp) => {
+                console.log("promptResp", promptResp);
+            })
+                .catch((error) => {
+                    error.text().then(response => {
+                        const errorDetails = {
+                            status: response.status,
+                            statusText: response.statusText,
+                            body: response
+                        };
+                        console.log("error while genetating token ", errorDetails);
+                    });
+                });
         })();
     }
     tokenRenewalTimer = setInterval(regenerateTokenIfExpired(null), TOKEN_CHECK_DELAY);
@@ -120,16 +120,16 @@ function regenerateTokenIfExpired(callback) {
                     callback();
                 }
             })
-            .catch((error)=>{
-                error.text().then(text => {
-                    const errorDetails = {
-                      status: response.status,
-                      statusText: response.statusText,
-                      body: text
-                    };
-                    console.log("error while genetating token ",errorDetails);
+                .catch((error) => {
+                    error.text().then(text => {
+                        const errorDetails = {
+                            status: response.status,
+                            statusText: response.statusText,
+                            body: text
+                        };
+                        console.log("error while genetating token ", errorDetails);
+                    });
                 });
-            });
         } else {
             console.log("Token valid till ", expiryTime);
             if (callback) {
@@ -145,7 +145,7 @@ function getToken() {
 }
 
 async function generateWatsonXToken() {
-    return new Promise((resolve,reject) => {
+    return new Promise((resolve, reject) => {
         let reqBody = ibmConfig.TOKEN_BODY + ibmConfig.IBM_CLOUD_API_KEY;
         const headers = {
             'Content-Type': 'application/x-www-form-urlencoded'
@@ -155,10 +155,10 @@ async function generateWatsonXToken() {
             headers: headers,
             body: reqBody
         };
-        console.log("reqBody",reqBody);
+        console.log("reqBody", reqBody);
         try {
-            fetch(ibmConfig.TOKEN_GEN_URL, requestOptions).then((resp)=>{
-                if(!resp.ok) {
+            fetch(ibmConfig.TOKEN_GEN_URL, requestOptions).then((resp) => {
+                if (!resp.ok) {
                     reject(resp);
                 } else {
                     resolve(resp.json());
@@ -171,7 +171,7 @@ async function generateWatsonXToken() {
 }
 
 async function sendPromptToWatsonX(prompt, max_token) {
-    return new Promise((resolve,reject) => {
+    return new Promise((resolve, reject) => {
         if (max_token != 0) {
             ibmConfig.parameters["max_new_tokens"] = max_token;
         }
@@ -185,15 +185,15 @@ async function sendPromptToWatsonX(prompt, max_token) {
             'Authorization': "Bearer " + getToken(),
             'Content-Type': 'application/json'
         };
-        console.log("reqBody",reqBody);
+        console.log("reqBody", reqBody);
         const requestOptions = {
             method: 'POST',
             headers: headers,
             body: JSON.stringify(reqBody)
         };
         try {
-            fetch(ibmConfig.PROMPT_URL, requestOptions).then((resp)=>{
-                if(!resp.ok) {
+            fetch(ibmConfig.PROMPT_URL, requestOptions).then((resp) => {
+                if (!resp.ok) {
                     reject(resp);
                 } else {
                     resolve(resp.json());
@@ -246,7 +246,7 @@ function syncDataLocally() {
     hashObject(stringifiedUSerData).then(hash => {
         if (userDataHash == null || userDataHash != hash) {
             fs.writeFileSync("data/users.json", stringifiedUSerData);
-            console.log("users synched locally at " , (new Date()));
+            console.log("users synched locally at ", (new Date()));
             userDataHash = hash;
         } else {
             console.log("users sync cancelled. As no change is done");
@@ -256,7 +256,7 @@ function syncDataLocally() {
     hashObject(stringifiedPostData).then(hash => {
         if (postsHash == null || postsHash != hash) {
             fs.writeFileSync("data/posts.json", stringifiedPostData);
-            console.log("posts synched locally at " , (new Date()));
+            console.log("posts synched locally at ", (new Date()));
             postsHash = hash;
         } else {
             console.log("posts sync cancelled. As no change is done");
@@ -294,36 +294,46 @@ app.get('/checkGrammar', async (req, res) => {
     if (userData[userId]) {
         let numberOfWords = caption.split(" ").length;
         try {
-            let promptResp = await sendPromptToWatsonX("fix the grammar of this text '" + caption + "' reply only the corrected text no quotes or special character or newline just the fixed string I want without any explanation", numberOfWords+5);
+            let promptResp = null;
             let fixed = { "value": caption };
-            console.log("promptResp", promptResp);
-            try {
-                if (promptResp.results && promptResp.results.length > 0) {
-                    let promptRespSplit = promptResp.results[0]["generated_text"].split("\n");
-                    fixed["generated_text"] = promptResp.results[0]["generated_text"];
-                    if (promptRespSplit.length >= 0) {
-                        for (let indx in promptRespSplit) {
-                            let respLine = promptRespSplit[indx].trim();
-                            if (respLine != "" && Math.abs(respLine.split(" ").length - numberOfWords) < 4) {
-                                fixed["value"] = respLine;
-                                break;
+            if (caption.startsWith("graph:")) {
+                promptResp = await sendPromptToWatsonX("write a javascript code to plot this curve in canvas '" + caption.replace("graph:", "") + "' provide just the code in the response no explanation or any other info", 200);
+                if(promptResp.results && promptResp.results.length>0 && promptResp.results[0]["generated_text"]) {
+                    fixed["value"] = promptResp.results[0]["generated_text"];
+                }
+                console.log("promptResp",promptResp);
+            } else {
+                promptResp = await sendPromptToWatsonX("fix the grammar of this text '" + caption + "' reply only the corrected text no quotes or special character or newline just the fixed string I want without any explanation", numberOfWords + 5);
+                console.log("promptResp", promptResp);
+                try {
+                    if (promptResp.results && promptResp.results.length > 0) {
+                        let promptRespSplit = promptResp.results[0]["generated_text"].split("\n");
+                        fixed["generated_text"] = promptResp.results[0]["generated_text"];
+                        if (promptRespSplit.length >= 0) {
+                            for (let indx in promptRespSplit) {
+                                let respLine = promptRespSplit[indx].trim();
+                                if (respLine != "" && Math.abs(respLine.split(" ").length - numberOfWords) < 4) {
+                                    fixed["value"] = respLine;
+                                    break;
+                                }
+                            }
+                        } else {
+                            promptRespSplit = promptResp.results[0]["generated_text"].split("'");
+                            if (promptRespSplit.length >= 3) {
+                                fixed["value"] = promptRespSplit[2];
+                            } else {
+                                fixed["value"] = promptResp.results[0]["generated_text"];
                             }
                         }
-                    } else {
-                        promptRespSplit = promptResp.results[0]["generated_text"].split("'");
-                        if (promptRespSplit.length >= 3) {
-                            fixed["value"] = promptRespSplit[2];
-                        } else {
-                            fixed["value"] = promptResp.results[0]["generated_text"];
-                        }
                     }
+                } catch (e) {
+                    console.log("error checking grammar", e);
                 }
-            } catch (e) {
-                console.log("error checking grammar",e);
             }
             res.json(fixed);
         } catch (e) {
-            res.json({"error":e});
+            console.log("error",e);
+            res.json({ "error": e });
         }
     } else {
         res.json({});
