@@ -7,7 +7,7 @@
     "TOKEN_BODY":"grant_type=urn:ibm:params:oauth:grant-type:apikey&apikey=",
     "parameters": {
 		"decoding_method": "greedy",
-		"max_new_tokens": 900,
+		"max_new_tokens": 50,
 		"min_new_tokens": 0,
 		"stop_sequences": [],
 		"repetition_penalty": 1

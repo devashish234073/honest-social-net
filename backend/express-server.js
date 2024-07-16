@@ -294,7 +294,7 @@ app.get('/checkGrammar', async (req, res) => {
     if (userData[userId]) {
         let numberOfWords = caption.split(" ").length;
         try {
-            let promptResp = await sendPromptToWatsonX("fix the grammar of this text '" + caption + "' reply only the correction do not provide any explanation just the corrected text", numberOfWords);
+            let promptResp = await sendPromptToWatsonX("fix the grammar of this text '" + caption + "' reply only the corrected text no quotes or special character or newline just the fixed string I want without any explanation", numberOfWords+5);
             let fixed = { "value": caption };
             console.log("promptResp", promptResp);
             try {
