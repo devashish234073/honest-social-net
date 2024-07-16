@@ -10,6 +10,8 @@ Also note to make AI image generation work before running "node index.js" you ne
 
 # For the "ANGULAR" version of the app open this branch https://github.com/devashish234073/honest-social-net/tree/angular-frontend-node-express-backend/
 
+# Angular branch has better UI , image generation using AI api and also grammer check using AI api.
+
 ## About the app's other basic features
 
 This is a social media world without password where fellow humans trust each others and each are honest to login with their own userid.
