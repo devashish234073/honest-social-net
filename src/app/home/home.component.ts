@@ -158,8 +158,11 @@ export class HomeComponent implements OnInit {
     console.log("graph rawRespSplit",rawRespSplit);
     for(let indx in rawRespSplit) {
       if(rawRespSplit[indx].trim().startsWith("javascript")) {
-        console.log("graph value selected",rawRespSplit[indx].trim());
-        return rawRespSplit[indx].replace("javascript","");
+        let js = rawRespSplit[indx].trim();
+        if(js.split(" ").length>5) {
+          console.log("graph value selected",rawRespSplit[indx].trim());
+          return rawRespSplit[indx].replace("javascript","");
+        }
       }
     }
     return rawResp;
