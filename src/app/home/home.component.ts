@@ -178,6 +178,11 @@ export class HomeComponent implements OnInit {
           let processedResp = this.processGraphResp(rawResp);
           this.jsCode = "setTimeout(()=>{"+processedResp+"},1000);";
           this.injectJs();
+        } else if(caption.startsWith("graph2:")) {
+          let rawResp = resp.body["value"];
+          let processedResp = this.processGraphResp(rawResp);
+          this.jsCode = "setTimeout(()=>{"+processedResp+"},1000);";
+          this.injectJs();
         } else {
           let decision = confirm(resp.body["value"] + "\nDo you want to replace the post caption with the grammer corrected value?");
           if (decision) {

@@ -7,7 +7,7 @@
         <button class="comment-button" (click)="checkGrammar()" [disabled]="checkGrammarLabel!='Check Grammar'">{{checkGrammarLabel}}</button><button class="comment-button" (click)="postStatus()">Post</button>
     </div>
     <div *ngIf="jsCode">
-        <canvas id="canvas"></canvas>
+        <canvas id="canvas" [title]="jsCode"></canvas>
         <div #codeBlock>
         </div>
     </div>
