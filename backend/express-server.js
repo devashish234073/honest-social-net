@@ -302,6 +302,13 @@ app.get('/checkGrammar', async (req, res) => {
                     fixed["value"] = promptResp.results[0]["generated_text"];
                 }
                 console.log("promptResp",promptResp);
+            } else if(caption.startsWith("graph2:")) {
+                let xtra = "Keep origin at the centre of the canvas with x axis towards left of it and y axis up fron the origin.";
+                promptResp = await sendPromptToWatsonX("write a javascript code to plot this curve in canvas '" + caption.replace("graph2:", "") + "' provide just the code in the response no explanation or any other info."+xtra, 200);
+                if(promptResp.results && promptResp.results.length>0 && promptResp.results[0]["generated_text"]) {
+                    fixed["value"] = promptResp.results[0]["generated_text"];
+                }
+                console.log("promptResp",promptResp);
             } else {
                 promptResp = await sendPromptToWatsonX("fix the grammar of this text '" + caption + "' reply only the corrected text no quotes or special character or newline just the fixed string I want without any explanation", numberOfWords + 5);
                 console.log("promptResp", promptResp);
