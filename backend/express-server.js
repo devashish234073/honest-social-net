@@ -271,10 +271,10 @@ setInterval(function () {
 
 populateData();
 
-/*const corsOptions = {
-    origin: 'http://localhost:4200',
+const corsOptions = {
+    origin: '*',
     optionsSuccessStatus: 200
-};*/
+};
 
 const allowedPrivateOrigin = process.env.ALLOWED_PRIVATE_ORIGIN;
 const allowedPublicOrigin = process.env.ALLOWED_PUBLIC_ORIGIN;
@@ -282,7 +282,7 @@ console.log("allowedPrivateOrigin",allowedPrivateOrigin);
 console.log("allowedPublicOrigin",allowedPublicOrigin);
 
 
-const corsOptions = {
+/*const corsOptions = {
     origin: function (origin, callback) {
         const allowedOrigins = [allowedPrivateOrigin, allowedPublicOrigin, 'http://localhost:4200'];
         if (!origin || allowedOrigins.indexOf(origin) !== -1) {
@@ -292,7 +292,7 @@ const corsOptions = {
         }
     },
     optionsSuccessStatus: 200
-};
+};*/
 
 app.use(cors(corsOptions));
 
