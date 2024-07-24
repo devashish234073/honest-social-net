@@ -276,11 +276,12 @@ populateData();
     optionsSuccessStatus: 200
 };*/
 
-const allowedOrigin = process.env.ALLOWED_ORIGIN;
+const allowedPrivateOrigin = process.env.ALLOWED_PRIVATE_ORIGIN;
+const allowedPublicOrigin = process.env.ALLOWED_PUBLIC_ORIGIN;
 
 const corsOptions = {
     origin: function (origin, callback) {
-        const allowedOrigins = [allowedOrigin, 'http://localhost:4200'];
+        const allowedOrigins = [allowedPrivateOrigin, allowedPublicOrigin, 'http://localhost:4200'];
         if (!origin || allowedOrigins.indexOf(origin) !== -1) {
             callback(null, true);
         } else {
