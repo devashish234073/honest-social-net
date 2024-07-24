@@ -122,9 +122,10 @@ function regenerateTokenIfExpired(callback) {
             })
                 .catch((error) => {
                     error.text().then(text => {
+                        let resp = JSON.parse(text);
                         const errorDetails = {
-                            status: response.status,
-                            statusText: response.statusText,
+                            status: resp.errorCode,
+                            statusText: resp.errorMessage,
                             body: text
                         };
                         console.log("error while genetating token ", errorDetails);
@@ -270,10 +271,25 @@ setInterval(function () {
 
 populateData();
 
-const corsOptions = {
+/*const corsOptions = {
     origin: 'http://localhost:4200',
     optionsSuccessStatus: 200
+};*/
+
+const allowedOrigin = process.env.ALLOWED_ORIGIN;
+
+const corsOptions = {
+    origin: function (origin, callback) {
+        const allowedOrigins = [allowedOrigin, 'http://localhost:4200'];
+        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    optionsSuccessStatus: 200
 };
+
 app.use(cors(corsOptions));
 
 app.use(bodyParser.json());
