@@ -30,7 +30,7 @@ export class AppComponent {
   ngOnInit(): void {
     this.token = sessionStorage.getItem("token");
     if(this.token) {
-      this.apiCallService.getData("http://localhost:3000/checkLogin",{"token":this.token}).subscribe((resp) => {
+      this.apiCallService.getData(this.apiCallService.getBackendHost()+"/checkLogin",{"token":this.token}).subscribe((resp) => {
         if (resp.body.loggedIn) {
           console.log("marked logged in",resp.body);
           sessionStorage.setItem("userId",resp.body.userId);
@@ -49,7 +49,7 @@ export class AppComponent {
   }
 
   getMenuData() {
-    this.apiCallService.getData("http://localhost:3000/getUserData",{"token":this.token}).subscribe((resp) => {
+    this.apiCallService.getData(this.apiCallService.getBackendHost()+"/getUserData",{"token":this.token}).subscribe((resp) => {
       console.log("menu data",resp.body);
       this.menuData = resp.body;
     });
@@ -82,7 +82,7 @@ export class AppComponent {
   }
 
   acceptFriendRequest(friendId:any) {
-    this.apiCallService.getData("http://localhost:3000/acceptFriendRequest?friendId="+friendId,{"token":this.token}).subscribe((resp) => {
+    this.apiCallService.getData(this.apiCallService.getBackendHost()+"/acceptFriendRequest?friendId="+friendId,{"token":this.token}).subscribe((resp) => {
       if(resp.body.message && resp.body.friendRequests && resp.body.friends) {
         this.menuData.friendRequests = resp.body.friendRequests;
         this.popupData.friendRequests = resp.body.friendRequests;
@@ -94,7 +94,7 @@ export class AppComponent {
   }
 
   rejectFriendRequest(friendId:any) {
-    this.apiCallService.getData("http://localhost:3000/rejectFriendRequest?friendId="+friendId,{"token":this.token}).subscribe((resp) => {
+    this.apiCallService.getData(this.apiCallService.getBackendHost()+"/rejectFriendRequest?friendId="+friendId,{"token":this.token}).subscribe((resp) => {
       if(resp.body.message && resp.body.friendRequests) {
         this.menuData.friendRequests = resp.body.friendRequests;
         this.popupData.friendRequests = resp.body.friendRequests;
@@ -105,7 +105,7 @@ export class AppComponent {
   }
 
   deleteNotification(notification:String) {
-    this.apiCallService.getData("http://localhost:3000/deleteNotification?notification="+notification,{"token":this.token}).subscribe((resp) => {
+    this.apiCallService.getData(this.apiCallService.getBackendHost()+"/deleteNotification?notification="+notification,{"token":this.token}).subscribe((resp) => {
       if(resp.body.message && resp.body.notifications) {
         this.menuData.notifications = resp.body.notifications;
         this.popupData.notifications = resp.body.notifications;
@@ -116,7 +116,7 @@ export class AppComponent {
   }
 
   unfriend(friendId:any) {
-    this.apiCallService.getData("http://localhost:3000/unFriend?friendId="+friendId,{"token":this.token}).subscribe((resp) => {
+    this.apiCallService.getData(this.apiCallService.getBackendHost()+"/unFriend?friendId="+friendId,{"token":this.token}).subscribe((resp) => {
       if(resp.body.message && resp.body.friends) {
         this.menuData.friends = resp.body.friends;
         this.popupData.friends = resp.body.friends;
@@ -135,7 +135,7 @@ export class AppComponent {
     } else if(user.indexOf(" ")>-1) {
       alert("user id can't contain space");
     } else {
-      this.apiCallService.getData("http://localhost:3000/login/" + user,{}).subscribe((resp: HttpResponse<any>) => {
+      this.apiCallService.getData(this.apiCallService.getBackendHost()+"/login/" + user,{}).subscribe((resp: HttpResponse<any>) => {
         console.log(resp);
         if (resp.body.loggedIn) {
           console.log("marked logged in");
