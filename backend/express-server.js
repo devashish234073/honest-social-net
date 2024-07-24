@@ -278,6 +278,9 @@ populateData();
 
 const allowedPrivateOrigin = process.env.ALLOWED_PRIVATE_ORIGIN;
 const allowedPublicOrigin = process.env.ALLOWED_PUBLIC_ORIGIN;
+console.log("allowedPrivateOrigin",allowedPrivateOrigin);
+console.log("allowedPublicOrigin",allowedPublicOrigin);
+
 
 const corsOptions = {
     origin: function (origin, callback) {
